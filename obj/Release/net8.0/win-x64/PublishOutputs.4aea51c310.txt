@@ -1,2 +1,0 @@
-/home/ubuntu/VS Code Projects/Pathfinder/Pathfinder/publish/win-x64/Pathfinder.pdb
-/home/ubuntu/VS Code Projects/Pathfinder/Pathfinder/publish/win-x64/Pathfinder.exe
