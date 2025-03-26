@@ -1,3 +1,6 @@
+
+<p align="center"><img src="https://github.com/user-attachments/assets/701b52e6-620e-45d4-a4e3-1301744360b2" width="300" height="225"></p>
+
 # Pathfinder - Hunt Builder
 
 Pathfinder is a cross-platform tool designed for Digital Forensics and Incident Response (DFIR) and threat hunting professionals. It converts Indicators of Compromise (IOCs) into search queries for multiple Endpoint Detection and Response (EDR) platforms, including SentinelOne, CrowdStrike, Microsoft Defender, Carbon Black Response, and Carbon Black Cloud. 
