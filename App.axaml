@@ -1,0 +1,9 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="using:Pathfinder.Converters"
+             x:Class="Pathfinder.App">
+    <Application.Resources>
+        <converters:StringToListConverter x:Key="StringToListConverter"/>
+        <converters:LineNumberConverter x:Key="LineNumberConverter"/>
+    </Application.Resources>
+</Application>
