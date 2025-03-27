@@ -7,6 +7,8 @@ Pathfinder is a cross-platform tool designed for Digital Forensics and Incident 
 
 Built with .NET 8 and Avalonia UI, Pathfinder offers a sleek, user-friendly interface for building and copying EDR-specific queries.
 
+<p align="center"><img src="https://github.com/user-attachments/assets/601ec317-7f24-44f6-8764-317a6b56e503"></p>
+
 ## Features
 - **Multi-EDR Support**: Generate queries for SentinelOne, CrowdStrike, Defender, CB Response, and CB Cloud.
 - **IOC Types**: Supports domains, IPs, MD5/SHA1/SHA256 hashes, file names, and command lines.
