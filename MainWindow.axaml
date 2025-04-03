@@ -13,113 +13,184 @@
         <converters:LineNumberConverter x:Key="LineNumberConverter"/>
         <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
     </Window.Resources>
+    <Window.Styles>
+        <Style Selector="Button.ClearButton">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="LightGray"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="LightGray"/>
+            <Setter Property="Padding" Value="4,2"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontFamily" Value="{Binding CurrentTheme.UIFontFamily}"/>
+        </Style>
+        <Style Selector="MenuItem">
+            <Setter Property="Foreground" Value="{Binding CurrentTheme.TextForeground}"/>
+            <Setter Property="FontFamily" Value="{Binding CurrentTheme.UIFontFamily}"/>
+        </Style>
+        <Style Selector="TextBlock.Label">
+            <Setter Property="Foreground" Value="LightGray"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+        <Style Selector="TextBlock.HuntBuilder">
+            <Setter Property="Foreground" Value="{Binding CurrentTheme.TextForeground}"/>
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontFamily" Value="{Binding CurrentTheme.UIFontFamily}"/>
+            <Setter Property="Margin" Value="0,0,0,20"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="TabItem TextBlock">
+            <Setter Property="Foreground" Value="{Binding CurrentTheme.TextForeground}"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontFamily" Value="{Binding CurrentTheme.UIFontFamily}"/>
+        </Style>
+    </Window.Styles>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Left Menu with ScrollViewer -->
         <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
-            <StackPanel Background="#1A1A1A" Width="300" Margin="10">
-                <TextBlock Text="Hunt Builder" FontSize="24" Foreground="White" FontFamily="Orbitron" Margin="0,0,0,20" TextAlignment="Center"/>
-                <TextBox Watermark="Enter Domains (newline-separated)" AcceptsReturn="True" Text="{Binding Domains, Converter={StaticResource StringToListConverter}}" Margin="0,0,0,10" Height="150"/>
-                <TextBox Watermark="Enter IPs (newline-separated)" AcceptsReturn="True" Text="{Binding IPs, Converter={StaticResource StringToListConverter}}" Margin="0,0,0,10" Height="150"/>
-                <TextBox Watermark="Enter MD5 Hashes (newline-separated)" AcceptsReturn="True" Text="{Binding MD5Hashes, Converter={StaticResource StringToListConverter}}" Margin="0,0,0,10" Height="150"/>
-                <TextBox Watermark="Enter SHA1 Hashes (newline-separated)" AcceptsReturn="True" Text="{Binding SHA1Hashes, Converter={StaticResource StringToListConverter}}" Margin="0,0,0,10" Height="150"/>
-                <TextBox Watermark="Enter SHA256 Hashes (newline-separated)" AcceptsReturn="True" Text="{Binding SHA256Hashes, Converter={StaticResource StringToListConverter}}" Margin="0,0,0,10" Height="150"/>
-                <TextBox Watermark="Enter File Names (newline-separated)" AcceptsReturn="True" Text="{Binding FileNames, Converter={StaticResource StringToListConverter}}" Margin="0,0,0,10" Height="150"/>
-                <TextBox Watermark="Enter Commands (newline-separated)" AcceptsReturn="True" Text="{Binding Commands, Converter={StaticResource StringToListConverter}}" Margin="0,0,0,10" Height="150"/>
+            <StackPanel Background="{Binding CurrentTheme.PanelBackground}" Width="300" Margin="10">
+                <DockPanel LastChildFill="False" Margin="0,0,0,10">
+                    <TextBlock Text="Hunt Builder" Classes="HuntBuilder" DockPanel.Dock="Left"/>
+                    <Menu DockPanel.Dock="Right">
+                        <MenuItem Header="⚙ Settings">
+                            <MenuItem Header="Theme">
+                                <MenuItem Header="Onyx (Default)" Command="{Binding SetOnyxThemeCommand}"/>
+                                <MenuItem Header="Matrix" Command="{Binding SetMatrixThemeCommand}"/>
+                                <MenuItem Header="Strawberry Milkshake" Command="{Binding SetStrawberryMilkshakeThemeCommand}"/>
+                                <MenuItem Header="Windows 95" Command="{Binding SetWindows95ThemeCommand}"/>
+                            </MenuItem>
+                        </MenuItem>
+                    </Menu>
+                </DockPanel>
+                
+                <DockPanel LastChildFill="False" Margin="0,0,0,5">
+                    <TextBlock Text="Domains" Classes="Label" DockPanel.Dock="Left"/>
+                    <Button Content="Clear" Command="{Binding ClearDomainsCommand}" Classes="ClearButton" DockPanel.Dock="Right"/>
+                </DockPanel>
+                <TextBox Watermark="Enter Domains (newline-separated)" AcceptsReturn="True" Text="{Binding Domains, Converter={StaticResource StringToListConverter}}" Margin="0,0,0,10" Height="150" FontFamily="Ubuntu Mono, Consolas, monospace"/>
+
+                <DockPanel LastChildFill="False" Margin="0,0,0,5">
+                    <TextBlock Text="IPs" Classes="Label" DockPanel.Dock="Left"/>
+                    <Button Content="Clear" Command="{Binding ClearIPsCommand}" Classes="ClearButton" DockPanel.Dock="Right"/>
+                </DockPanel>
+                <TextBox Watermark="Enter IPs (newline-separated)" AcceptsReturn="True" Text="{Binding IPs, Converter={StaticResource StringToListConverter}}" Margin="0,0,0,10" Height="150" FontFamily="Ubuntu Mono, Consolas, monospace"/>
+
+                <DockPanel LastChildFill="False" Margin="0,0,0,5">
+                    <TextBlock Text="MD5 Hashes" Classes="Label" DockPanel.Dock="Left"/>
+                    <Button Content="Clear" Command="{Binding ClearMD5HashesCommand}" Classes="ClearButton" DockPanel.Dock="Right"/>
+                </DockPanel>
+                <TextBox Watermark="Enter MD5 Hashes (newline-separated)" AcceptsReturn="True" Text="{Binding MD5Hashes, Converter={StaticResource StringToListConverter}}" Margin="0,0,0,10" Height="150" FontFamily="Ubuntu Mono, Consolas, monospace"/>
+
+                <DockPanel LastChildFill="False" Margin="0,0,0,5">
+                    <TextBlock Text="SHA1 Hashes" Classes="Label" DockPanel.Dock="Left"/>
+                    <Button Content="Clear" Command="{Binding ClearSHA1HashesCommand}" Classes="ClearButton" DockPanel.Dock="Right"/>
+                </DockPanel>
+                <TextBox Watermark="Enter SHA1 Hashes (newline-separated)" AcceptsReturn="True" Text="{Binding SHA1Hashes, Converter={StaticResource StringToListConverter}}" Margin="0,0,0,10" Height="150" FontFamily="Ubuntu Mono, Consolas, monospace"/>
+
+                <DockPanel LastChildFill="False" Margin="0,0,0,5">
+                    <TextBlock Text="SHA256 Hashes" Classes="Label" DockPanel.Dock="Left"/>
+                    <Button Content="Clear" Command="{Binding ClearSHA256HashesCommand}" Classes="ClearButton" DockPanel.Dock="Right"/>
+                </DockPanel>
+                <TextBox Watermark="Enter SHA256 Hashes (newline-separated)" AcceptsReturn="True" Text="{Binding SHA256Hashes, Converter={StaticResource StringToListConverter}}" Margin="0,0,0,10" Height="150" FontFamily="Ubuntu Mono, Consolas, monospace"/>
+
+                <DockPanel LastChildFill="False" Margin="0,0,0,5">
+                    <TextBlock Text="File Names" Classes="Label" DockPanel.Dock="Left"/>
+                    <Button Content="Clear" Command="{Binding ClearFileNamesCommand}" Classes="ClearButton" DockPanel.Dock="Right"/>
+                </DockPanel>
+                <TextBox Watermark="Enter File Names (newline-separated)" AcceptsReturn="True" Text="{Binding FileNames, Converter={StaticResource StringToListConverter}}" Margin="0,0,0,10" Height="150" FontFamily="Ubuntu Mono, Consolas, monospace"/>
+
+                <DockPanel LastChildFill="False" Margin="0,0,0,5">
+                    <TextBlock Text="Commands" Classes="Label" DockPanel.Dock="Left"/>
+                    <Button Content="Clear" Command="{Binding ClearCommandsCommand}" Classes="ClearButton" DockPanel.Dock="Right"/>
+                </DockPanel>
+                <TextBox Watermark="Enter Commands (newline-separated)" AcceptsReturn="True" Text="{Binding Commands, Converter={StaticResource StringToListConverter}}" Margin="0,0,0,10" Height="150" FontFamily="Ubuntu Mono, Consolas, monospace"/>
+
+                <DockPanel LastChildFill="False" Margin="0,0,0,5">
+                    <TextBlock Text="Process Names" Classes="Label" DockPanel.Dock="Left"/>
+                    <Button Content="Clear" Command="{Binding ClearProcessNamesCommand}" Classes="ClearButton" DockPanel.Dock="Right"/>
+                </DockPanel>
+                <TextBox Watermark="Enter Process Names (newline-separated)" AcceptsReturn="True" Text="{Binding ProcessNames, Converter={StaticResource StringToListConverter}}" Margin="0,0,0,10" Height="150" FontFamily="Ubuntu Mono, Consolas, monospace"/>
+
+                <DockPanel LastChildFill="False" Margin="0,0,0,5">
+                    <TextBlock Text="File Paths" Classes="Label" DockPanel.Dock="Left"/>
+                    <Button Content="Clear" Command="{Binding ClearFilePathsCommand}" Classes="ClearButton" DockPanel.Dock="Right"/>
+                </DockPanel>
+                <TextBox Watermark="Enter File Paths (newline-separated)" AcceptsReturn="True" Text="{Binding FilePaths, Converter={StaticResource StringToListConverter}}" Margin="0,0,0,10" Height="150" FontFamily="Ubuntu Mono, Consolas, monospace"/>
             </StackPanel>
         </ScrollViewer>
 
-        <!-- Right Query Outputs in Tabs -->
-        <TabControl Grid.Column="1" Background="#333333" Margin="20">
+        <TabControl Grid.Column="1" Background="{Binding CurrentTheme.TabBackground}" Margin="20">
             <TabItem>
                 <TabItem.Header>
-                    <TextBlock Text="SentinelOne" FontFamily="Ubuntu Mono, Consolas, Courier New" Foreground="White" FontSize="16"/>
+                    <TextBlock Text="SentinelOne"/>
                 </TabItem.Header>
-                <Grid RowDefinitions="Auto,*,Auto">
-                    <TextBlock Grid.Row="0" Text="{Binding SentinelOneReminder}" Foreground="Red" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding SentinelOneReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
-                    <Grid Grid.Row="1" ColumnDefinitions="Auto,*" Margin="0,0,0,10">
-                        <TextBlock Grid.Column="0" Text="{Binding SentinelOneQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, Courier New" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
-                        <TextBox Grid.Column="1" Text="{Binding SentinelOneQuery}" IsReadOnly="True" Background="#222222" Foreground="White" FontFamily="Ubuntu Mono, Consolas, Courier New" AcceptsReturn="True" AcceptsTab="True" TextWrapping="Wrap"/>
+                <Grid RowDefinitions="Auto,Auto,Auto,*">
+                    <Button Grid.Row="0" Content="Copy to Clipboard" Command="{Binding CopySentinelOneCommand}" HorizontalAlignment="Left" Margin="10,0,0,10"/>
+                    <TextBlock Grid.Row="1" Text="{Binding SentinelOneReminder}" Foreground="Red" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding SentinelOneReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
+                    <TextBlock Grid.Row="2" Text="{Binding FilePathsReminder}" Foreground="Orange" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding FilePathsReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
+                    <Grid Grid.Row="3" ColumnDefinitions="Auto,*">
+                        <TextBlock Grid.Column="0" Text="{Binding SentinelOneQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
+                        <TextBox Grid.Column="1" Text="{Binding SentinelOneQuery}" IsReadOnly="True" Background="{Binding CurrentTheme.TextBoxBackground}" Foreground="{Binding CurrentTheme.TextForeground}" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" AcceptsReturn="True" AcceptsTab="True" TextWrapping="Wrap"/>
                     </Grid>
-                    <StackPanel Grid.Row="2" Orientation="Horizontal">
-                        <Button Content="Copy" Command="{Binding CopySentinelOneCommand}" Margin="0,0,10,0"/>
-                        <TextBlock Text="Copied" Foreground="Cyan" FontSize="14" Margin="0,0,10,0" IsVisible="{Binding IsCopiedSentinelOne}"/>
-                        <TextBlock Text="{Binding SentinelOneQuery.Length, StringFormat='Character Count: {0}'}" Foreground="White" FontFamily="Ubuntu Mono, Consolas, Courier New" FontSize="12"/>
-                    </StackPanel>
                 </Grid>
             </TabItem>
 
             <TabItem>
                 <TabItem.Header>
-                    <TextBlock Text="CrowdStrike" FontFamily="Ubuntu Mono, Consolas, Courier New" Foreground="White" FontSize="16"/>
+                    <TextBlock Text="CrowdStrike"/>
                 </TabItem.Header>
-                <Grid RowDefinitions="*,Auto">
-                    <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,10">
-                        <TextBlock Grid.Column="0" Text="{Binding CrowdStrikeQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, Courier New" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
-                        <TextBox Grid.Column="1" Text="{Binding CrowdStrikeQuery}" IsReadOnly="True" Background="#222222" Foreground="White" FontFamily="Ubuntu Mono, Consolas, Courier New" AcceptsReturn="True" AcceptsTab="True" TextWrapping="Wrap"/>
+                <Grid RowDefinitions="Auto,Auto,*">
+                    <Button Grid.Row="0" Content="Copy to Clipboard" Command="{Binding CopyCrowdStrikeCommand}" HorizontalAlignment="Left" Margin="10,0,0,10"/>
+                    <TextBlock Grid.Row="1" Text="{Binding CrowdStrikeReminder}" Foreground="Red" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding CrowdStrikeReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
+                    <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
+                        <TextBlock Grid.Column="0" Text="{Binding CrowdStrikeQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
+                        <TextBox Grid.Column="1" Text="{Binding CrowdStrikeQuery}" IsReadOnly="True" Background="{Binding CurrentTheme.TextBoxBackground}" Foreground="{Binding CurrentTheme.TextForeground}" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" AcceptsReturn="True" AcceptsTab="True" TextWrapping="Wrap"/>
                     </Grid>
-                    <StackPanel Grid.Row="1" Orientation="Horizontal">
-                        <Button Content="Copy" Command="{Binding CopyCrowdStrikeCommand}" Margin="0,0,10,0"/>
-                        <TextBlock Text="Copied" Foreground="Cyan" FontSize="14" Margin="0,0,10,0" IsVisible="{Binding IsCopiedCrowdStrike}"/>
-                        <TextBlock Text="{Binding CrowdStrikeQuery.Length, StringFormat='Character Count: {0}'}" Foreground="White" FontFamily="Ubuntu Mono, Consolas, Courier New" FontSize="12"/>
-                    </StackPanel>
                 </Grid>
             </TabItem>
 
             <TabItem>
                 <TabItem.Header>
-                    <TextBlock Text="Defender" FontFamily="Ubuntu Mono, Consolas, Courier New" Foreground="White" FontSize="16"/>
+                    <TextBlock Text="Defender"/>
                 </TabItem.Header>
-                <Grid RowDefinitions="*,Auto">
-                    <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,10">
-                        <TextBlock Grid.Column="0" Text="{Binding DefenderQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, Courier New" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
-                        <TextBox Grid.Column="1" Text="{Binding DefenderQuery}" IsReadOnly="True" Background="#222222" Foreground="White" FontFamily="Ubuntu Mono, Consolas, Courier New" AcceptsReturn="True" AcceptsTab="True" TextWrapping="Wrap"/>
+                <Grid RowDefinitions="Auto,Auto,*">
+                    <Button Grid.Row="0" Content="Copy to Clipboard" Command="{Binding CopyDefenderCommand}" HorizontalAlignment="Left" Margin="10,0,0,10"/>
+                    <TextBlock Grid.Row="1" Text="{Binding DefenderReminder}" Foreground="Red" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding DefenderReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
+                    <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
+                        <TextBlock Grid.Column="0" Text="{Binding DefenderQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
+                        <TextBox Grid.Column="1" Text="{Binding DefenderQuery}" IsReadOnly="True" Background="{Binding CurrentTheme.TextBoxBackground}" Foreground="{Binding CurrentTheme.TextForeground}" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" AcceptsReturn="True" AcceptsTab="True" TextWrapping="Wrap"/>
                     </Grid>
-                    <StackPanel Grid.Row="1" Orientation="Horizontal">
-                        <Button Content="Copy" Command="{Binding CopyDefenderCommand}" Margin="0,0,10,0"/>
-                        <TextBlock Text="Copied" Foreground="Cyan" FontSize="14" Margin="0,0,10,0" IsVisible="{Binding IsCopiedDefender}"/>
-                        <TextBlock Text="{Binding DefenderQuery.Length, StringFormat='Character Count: {0}'}" Foreground="White" FontFamily="Ubuntu Mono, Consolas, Courier New" FontSize="12"/>
-                    </StackPanel>
                 </Grid>
             </TabItem>
 
             <TabItem>
                 <TabItem.Header>
-                    <TextBlock Text="CB Response" FontFamily="Ubuntu Mono, Consolas, Courier New" Foreground="White" FontSize="16"/>
+                    <TextBlock Text="CB Response"/>
                 </TabItem.Header>
-                <Grid RowDefinitions="Auto,*,Auto">
-                    <TextBlock Grid.Row="0" Text="{Binding CBResponseReminder}" Foreground="Red" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding CBResponseReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
-                    <Grid Grid.Row="1" ColumnDefinitions="Auto,*" Margin="0,0,0,10">
-                        <TextBlock Grid.Column="0" Text="{Binding CBResponseQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, Courier New" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
-                        <TextBox Grid.Column="1" Text="{Binding CBResponseQuery}" IsReadOnly="True" Background="#222222" Foreground="White" FontFamily="Ubuntu Mono, Consolas, Courier New" AcceptsReturn="True" AcceptsTab="True" TextWrapping="Wrap"/>
+                <Grid RowDefinitions="Auto,Auto,*">
+                    <Button Grid.Row="0" Content="Copy to Clipboard" Command="{Binding CopyCBResponseCommand}" HorizontalAlignment="Left" Margin="10,0,0,10"/>
+                    <TextBlock Grid.Row="1" Text="{Binding CBResponseReminder}" Foreground="Red" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding CBResponseReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
+                    <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
+                        <TextBlock Grid.Column="0" Text="{Binding CBResponseQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
+                        <TextBox Grid.Column="1" Text="{Binding CBResponseQuery}" IsReadOnly="True" Background="{Binding CurrentTheme.TextBoxBackground}" Foreground="{Binding CurrentTheme.TextForeground}" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" AcceptsReturn="True" AcceptsTab="True" TextWrapping="Wrap"/>
                     </Grid>
-                    <StackPanel Grid.Row="2" Orientation="Horizontal">
-                        <Button Content="Copy" Command="{Binding CopyCBResponseCommand}" Margin="0,0,10,0"/>
-                        <TextBlock Text="Copied" Foreground="Cyan" FontSize="14" Margin="0,0,10,0" IsVisible="{Binding IsCopiedCBResponse}"/>
-                        <TextBlock Text="{Binding CBResponseQuery.Length, StringFormat='Character Count: {0}'}" Foreground="White" FontFamily="Ubuntu Mono, Consolas, Courier New" FontSize="12"/>
-                    </StackPanel>
                 </Grid>
             </TabItem>
 
             <TabItem>
                 <TabItem.Header>
-                    <TextBlock Text="CB Cloud" FontFamily="Ubuntu Mono, Consolas, Courier New" Foreground="White" FontSize="16"/>
+                    <TextBlock Text="CB Cloud"/>
                 </TabItem.Header>
-                <Grid RowDefinitions="Auto,*,Auto">
-                    <TextBlock Grid.Row="0" Text="{Binding CBCloudReminder}" Foreground="Red" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding CBCloudReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
-                    <Grid Grid.Row="1" ColumnDefinitions="Auto,*" Margin="0,0,0,10">
-                        <TextBlock Grid.Column="0" Text="{Binding CBCloudQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, Courier New" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
-                        <TextBox Grid.Column="1" Text="{Binding CBCloudQuery}" IsReadOnly="True" Background="#222222" Foreground="White" FontFamily="Ubuntu Mono, Consolas, Courier New" AcceptsReturn="True" AcceptsTab="True" TextWrapping="Wrap"/>
+                <Grid RowDefinitions="Auto,Auto,*">
+                    <Button Grid.Row="0" Content="Copy to Clipboard" Command="{Binding CopyCBCloudCommand}" HorizontalAlignment="Left" Margin="10,0,0,10"/>
+                    <TextBlock Grid.Row="1" Text="{Binding CBCloudReminder}" Foreground="Red" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding CBCloudReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
+                    <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
+                        <TextBlock Grid.Column="0" Text="{Binding CBCloudQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
+                        <TextBox Grid.Column="1" Text="{Binding CBCloudQuery}" IsReadOnly="True" Background="{Binding CurrentTheme.TextBoxBackground}" Foreground="{Binding CurrentTheme.TextForeground}" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" AcceptsReturn="True" AcceptsTab="True" TextWrapping="Wrap"/>
                     </Grid>
-                    <StackPanel Grid.Row="2" Orientation="Horizontal">
-                        <Button Content="Copy" Command="{Binding CopyCBCloudCommand}" Margin="0,0,10,0"/>
-                        <TextBlock Text="Copied" Foreground="Cyan" FontSize="14" Margin="0,0,10,0" IsVisible="{Binding IsCopiedCBCloud}"/>
-                        <TextBlock Text="{Binding CBCloudQuery.Length, StringFormat='Character Count: {0}'}" Foreground="White" FontFamily="Ubuntu Mono, Consolas, Courier New" FontSize="12"/>
-                    </StackPanel>
                 </Grid>
             </TabItem>
         </TabControl>

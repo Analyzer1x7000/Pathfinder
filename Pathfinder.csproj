@@ -1,12 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>Exe</OutputType> <!-- Changed from WinExe to Exe -->
     <TargetFramework>net8.0</TargetFramework>
     <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
     <Nullable>enable</Nullable>
     <SelfContained>true</SelfContained>
     <PublishSingleFile>true</PublishSingleFile>
     <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+    <OutputType>Exe</OutputType>
+    <OutputType Condition="'$(RuntimeIdentifier)' == 'win-x64'">WinExe</OutputType>
+    <SubSystem Condition="'$(RuntimeIdentifier)' == 'win-x64'">Windows</SubSystem>
+    <ApplicationIcon>Assets\Pathfinder.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.2.5" />
@@ -14,5 +17,6 @@
     <PackageReference Include="Avalonia.ReactiveUI" Version="11.2.5" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.5" />
     <PackageReference Include="System.Reactive" Version="6.0.1" />
+    <AvaloniaResource Include="Assets\Pathfinder.ico" />
   </ItemGroup>
 </Project>

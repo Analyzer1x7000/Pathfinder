@@ -1,8 +1,11 @@
 using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes; // Added this
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Themes.Fluent;
 using Avalonia.Styling;
+using Avalonia.Platform;
+using System;
 
 namespace Pathfinder
 {
@@ -19,7 +22,9 @@ namespace Pathfinder
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                desktop.MainWindow = new MainWindow();
+                var mainWindow = new MainWindow();
+                mainWindow.Icon = new WindowIcon(AssetLoader.Open(new Uri("avares://Pathfinder/Assets/Pathfinder.ico")));
+                desktop.MainWindow = mainWindow;
             }
             base.OnFrameworkInitializationCompleted();
         }
