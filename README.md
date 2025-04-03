@@ -11,7 +11,7 @@ Built with .NET 8 and Avalonia UI, Pathfinder offers a sleek, user-friendly inte
 
 ## Features
 - **Multi-EDR Support**: Generate queries for SentinelOne, CrowdStrike, Defender, CB Response, and CB Cloud.
-- **IOC Types**: Supports domains, IPs, MD5/SHA1/SHA256 hashes, file names, and command lines.
+- **IOC Types**: Supports domains, IPs, MD5/SHA1/SHA256 hashes, file names, and command lines, and more.
 - **Tabbed Interface**: View and copy queries in separate tabs for each EDR platform.
 - **Word Wrap**: Output text wraps for easy reading, with line and character counts.
 - **Cross-Platform**: Runs on Windows and Linux with standalone executables.
