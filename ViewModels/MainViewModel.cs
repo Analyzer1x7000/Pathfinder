@@ -402,19 +402,19 @@ namespace Pathfinder.ViewModels
 
             if (Commands.Any())
             {
-                var cmdConditions = string.Join(" OR ", Commands.Select(c => $"(ProcessCommandLine like \"{c}\" OR InitiatingProcessCommandLine like \"{c}\")"));
+                var cmdConditions = string.Join(" or ", Commands.Select(c => $"(ProcessCommandLine like \"{c}\" or InitiatingProcessCommandLine like \"{c}\")"));
                 parts.Add($"(DeviceProcessEvents\n| where {cmdConditions})");
             }
 
             if (ProcessNames.Any())
             {
-                var processConditions = string.Join(" OR ", ProcessNames.Select(p => $"FileName like \"{p}\""));
+                var processConditions = string.Join(" or ", ProcessNames.Select(p => $"FileName like \"{p}\""));
                 parts.Add($"(DeviceProcessEvents\n| where ({processConditions}))");
             }
 
             if (FilePaths.Any())
             {
-                var pathConditions = string.Join(" OR ", FilePaths.Select(p => $"FolderPath contains tolower(\"{p}\")"));
+                var pathConditions = string.Join(" or ", FilePaths.Select(p => $"FolderPath contains tolower(\"{p}\")"));
                 parts.Add($"(DeviceFileEvents\n| where ({pathConditions}))");
             }
 
