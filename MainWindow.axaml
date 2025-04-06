@@ -15,20 +15,84 @@
     </Window.Resources>
     <Window.Styles>
         <Style Selector="Button.ClearButton">
-            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Background" Value="{Binding CurrentTheme.ButtonBackground}"/>
             <Setter Property="BorderBrush" Value="LightGray"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Foreground" Value="LightGray"/>
-            <Setter Property="Padding" Value="4,2"/>
+            <Setter Property="Foreground" Value="{Binding CurrentTheme.ButtonForeground}"/>
+            <Setter Property="Padding" Value="6,4"/>
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="FontFamily" Value="{Binding CurrentTheme.UIFontFamily}"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Opacity" Value="1"/>
+            <Style.Animations>
+                <Animation Duration="0:0:0.2" FillMode="Both">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Opacity" Value="1"/>
+                        <Setter Property="Background" Value="{Binding CurrentTheme.ButtonBackground}"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Opacity" Value="0.95"/>
+                        <Setter Property="Background" Value="#444444"/>
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+        <Style Selector="Button.ClearButton:pointerover">
+            <Setter Property="Background" Value="#444444"/>
+        </Style>
+        <Style Selector="Button.ClearButton:pressed">
+            <Setter Property="Opacity" Value="0.8"/>
+            <Setter Property="Background" Value="#222222"/>
+        </Style>
+        <Style Selector="ToggleButton.CollapseButton">
+            <Setter Property="Background" Value="{Binding CurrentTheme.ButtonBackground}"/>
+            <Setter Property="BorderBrush" Value="LightGray"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="{Binding CurrentTheme.ButtonForeground}"/>
+            <Setter Property="Padding" Value="6,4"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontFamily" Value="{Binding CurrentTheme.UIFontFamily}"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Opacity" Value="1"/>
+            <Setter Property="Width" Value="20"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          TextBlock.Foreground="{TemplateBinding Foreground}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="ToggleButton.CollapseButton:not(:checked)">
+            <Setter Property="Content" Value="[+]"/>
+        </Style>
+        <Style Selector="ToggleButton.CollapseButton:checked">
+            <Setter Property="Content" Value="[-]"/>
+        </Style>
+        <Style Selector="ToggleButton.CollapseButton:pointerover">
+            <Setter Property="Background" Value="#444444"/>
+        </Style>
+        <Style Selector="ToggleButton.CollapseButton:pressed">
+            <Setter Property="Opacity" Value="0.8"/>
+            <Setter Property="Background" Value="#222222"/>
         </Style>
         <Style Selector="MenuItem">
             <Setter Property="Foreground" Value="{Binding CurrentTheme.TextForeground}"/>
             <Setter Property="FontFamily" Value="{Binding CurrentTheme.UIFontFamily}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="CornerRadius" Value="4"/>
+        </Style>
+        <Style Selector="MenuItem:pointerover">
+            <Setter Property="Background" Value="#20FFFFFF"/>
         </Style>
         <Style Selector="TextBlock.Label">
-            <Setter Property="Foreground" Value="LightGray"/>
+            <Setter Property="Foreground" Value="{Binding CurrentTheme.TextForeground}"/>
             <Setter Property="FontSize" Value="12"/>
         </Style>
         <Style Selector="TextBlock.HuntBuilder">
@@ -43,156 +107,376 @@
             <Setter Property="FontSize" Value="16"/>
             <Setter Property="FontFamily" Value="{Binding CurrentTheme.UIFontFamily}"/>
         </Style>
+        <Style Selector="TabItem">
+            <Setter Property="CornerRadius" Value="6 6 0 0"/>
+            <Setter Property="Background" Value="{Binding CurrentTheme.TabBackground}"/>
+        </Style>
+        <Style Selector="TabItem:selected">
+            <Setter Property="Background" Value="{Binding CurrentTheme.TabBackground}"/>
+            <Setter Property="BorderBrush" Value="#50FFFFFF"/>
+            <Setter Property="BorderThickness" Value="2"/>
+        </Style>
+        <Style Selector="GridSplitter">
+            <Setter Property="Width" Value="5"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Opacity" Value="0"/>
+        </Style>
+        <Style Selector="GridSplitter:pointerover">
+            <Setter Property="Background" Value="Gray"/>
+            <Setter Property="Opacity" Value="1"/>
+        </Style>
+        <Style Selector="TextBlock.Output">
+            <Setter Property="Foreground" Value="{Binding CurrentTheme.TextForeground}"/>
+            <Setter Property="FontFamily" Value="Ubuntu Mono, Consolas, JetBrains Mono"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Padding" Value="4"/>
+        </Style>
     </Window.Styles>
-    <Grid>
+    <Grid Background="{Binding CurrentTheme.PanelBackground}">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto" MinWidth="200"/>
+            <ColumnDefinition Width="5"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
-            <StackPanel Background="{Binding CurrentTheme.PanelBackground}" Width="300" Margin="10">
-                <DockPanel LastChildFill="False" Margin="0,0,0,10">
-                    <TextBlock Text="Hunt Builder" Classes="HuntBuilder" DockPanel.Dock="Left"/>
-                    <Menu DockPanel.Dock="Right">
-                        <MenuItem Header="⚙ Settings">
-                            <MenuItem Header="Theme">
-                                <MenuItem Header="Onyx (Default)" Command="{Binding SetOnyxThemeCommand}"/>
-                                <MenuItem Header="Matrix" Command="{Binding SetMatrixThemeCommand}"/>
-                                <MenuItem Header="Strawberry Milkshake" Command="{Binding SetStrawberryMilkshakeThemeCommand}"/>
-                                <MenuItem Header="Windows 95" Command="{Binding SetWindows95ThemeCommand}"/>
-                            </MenuItem>
-                        </MenuItem>
-                    </Menu>
-                </DockPanel>
-                
-                <DockPanel LastChildFill="False" Margin="0,0,0,5">
-                    <TextBlock Text="Domains" Classes="Label" DockPanel.Dock="Left"/>
-                    <Button Content="Clear" Command="{Binding ClearDomainsCommand}" Classes="ClearButton" DockPanel.Dock="Right"/>
-                </DockPanel>
-                <TextBox Watermark="Enter Domains (newline-separated)" AcceptsReturn="True" Text="{Binding Domains, Converter={StaticResource StringToListConverter}}" Margin="0,0,0,10" Height="150" FontFamily="Ubuntu Mono, Consolas, monospace"/>
+        <!-- Left Panel with Pseudo-Shadow -->
+        <Border Grid.Column="0" Background="#40000000" CornerRadius="10" Margin="15,15,5,15" ZIndex="0"/>
+        <Border Grid.Column="0" 
+                Background="{Binding CurrentTheme.PanelBackground}" 
+                CornerRadius="8" 
+                Margin="10" 
+                ZIndex="1">
+            <Grid RowDefinitions="Auto,*">
+                <!-- Fixed Header -->
+                <StackPanel Grid.Row="0" Margin="10">
+                    <DockPanel LastChildFill="False" Margin="0,0,0,10">
+                        <TextBlock Text="Pathfinder" Classes="HuntBuilder" DockPanel.Dock="Left"/>
+                            <Menu DockPanel.Dock="Right">
+                                <MenuItem Header="⚙ Settings">
+                                    <MenuItem Header="Theme">
+                                        <MenuItem Header="Night Shift (Default)" Command="{Binding SetNightShiftThemeCommand}"/>
+                                        <MenuItem Header="Day Shift" Command="{Binding SetDayShiftThemeCommand}"/>
+                                        <MenuItem Header="Matrix" Command="{Binding SetMatrixThemeCommand}"/>
+                                        <MenuItem Header="Strawberry Milkshake" Command="{Binding SetStrawberryMilkshakeThemeCommand}"/>
+                                        <MenuItem Header="Windows 95" Command="{Binding SetWindows95ThemeCommand}"/>
+                                    </MenuItem>
+                                </MenuItem>
+                            </Menu>
+                    </DockPanel>
 
-                <DockPanel LastChildFill="False" Margin="0,0,0,5">
-                    <TextBlock Text="IPs" Classes="Label" DockPanel.Dock="Left"/>
-                    <Button Content="Clear" Command="{Binding ClearIPsCommand}" Classes="ClearButton" DockPanel.Dock="Right"/>
-                </DockPanel>
-                <TextBox Watermark="Enter IPs (newline-separated)" AcceptsReturn="True" Text="{Binding IPs, Converter={StaticResource StringToListConverter}}" Margin="0,0,0,10" Height="150" FontFamily="Ubuntu Mono, Consolas, monospace"/>
+                    <!-- Collapse All Button -->
+                    <DockPanel LastChildFill="False" Margin="0,0,0,10">
+                        <Border Background="#30000000" CornerRadius="8" Margin="0,0,5,0" Padding="2" DockPanel.Dock="Right">
+                            <Button Content="Collapse All" Command="{Binding CollapseAllCommand}" Classes="ClearButton"/>
+                        </Border>
+                    </DockPanel>
+                </StackPanel>
 
-                <DockPanel LastChildFill="False" Margin="0,0,0,5">
-                    <TextBlock Text="MD5 Hashes" Classes="Label" DockPanel.Dock="Left"/>
-                    <Button Content="Clear" Command="{Binding ClearMD5HashesCommand}" Classes="ClearButton" DockPanel.Dock="Right"/>
-                </DockPanel>
-                <TextBox Watermark="Enter MD5 Hashes (newline-separated)" AcceptsReturn="True" Text="{Binding MD5Hashes, Converter={StaticResource StringToListConverter}}" Margin="0,0,0,10" Height="150" FontFamily="Ubuntu Mono, Consolas, monospace"/>
+                <!-- Scrollable Content -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch">
+                    <StackPanel Margin="10">
+                        <!-- Domains Section -->
+                        <StackPanel Margin="0,0,0,5">
+                            <DockPanel LastChildFill="False" Margin="0,0,0,2">
+                                <TextBlock Text="Domains" Classes="Label" DockPanel.Dock="Left"/>
+                                <ToggleButton Name="DomainsCollapseButton" Classes="CollapseButton" IsChecked="{Binding IsDomainsCollapsed, Mode=TwoWay}" Margin="0,0,10,0" DockPanel.Dock="Right"/>
+                                <Border Background="#30000000" CornerRadius="8" Margin="0,0,5,0" Padding="2" DockPanel.Dock="Right">
+                                    <Button Content="Clear" Command="{Binding ClearDomainsCommand}" Classes="ClearButton"/>
+                                </Border>
+                            </DockPanel>
+                            <TextBox Name="DomainsTextBox" 
+                                     Watermark="Enter Domains (newline-separated)" 
+                                     AcceptsReturn="True" 
+                                     Text="{Binding Domains, Converter={StaticResource StringToListConverter}}" 
+                                     Margin="0,0,0,10" 
+                                     Height="150" 
+                                     FontFamily="Ubuntu Mono, Consolas, monospace" 
+                                     IsVisible="{Binding #DomainsCollapseButton.IsChecked}"/>
+                        </StackPanel>
 
-                <DockPanel LastChildFill="False" Margin="0,0,0,5">
-                    <TextBlock Text="SHA1 Hashes" Classes="Label" DockPanel.Dock="Left"/>
-                    <Button Content="Clear" Command="{Binding ClearSHA1HashesCommand}" Classes="ClearButton" DockPanel.Dock="Right"/>
-                </DockPanel>
-                <TextBox Watermark="Enter SHA1 Hashes (newline-separated)" AcceptsReturn="True" Text="{Binding SHA1Hashes, Converter={StaticResource StringToListConverter}}" Margin="0,0,0,10" Height="150" FontFamily="Ubuntu Mono, Consolas, monospace"/>
+                        <!-- IPs Section -->
+                        <StackPanel Margin="0,0,0,5">
+                            <DockPanel LastChildFill="False" Margin="0,0,0,2">
+                                <TextBlock Text="IPs" Classes="Label" DockPanel.Dock="Left"/>
+                                <ToggleButton Name="IPsCollapseButton" Classes="CollapseButton" IsChecked="{Binding IsIPsCollapsed, Mode=TwoWay}" Margin="0,0,10,0" DockPanel.Dock="Right"/>
+                                <Border Background="#30000000" CornerRadius="8" Margin="0,0,5,0" Padding="2" DockPanel.Dock="Right">
+                                    <Button Content="Clear" Command="{Binding ClearIPsCommand}" Classes="ClearButton"/>
+                                </Border>
+                            </DockPanel>
+                            <TextBox Name="IPsTextBox" 
+                                     Watermark="Enter IPs (newline-separated)" 
+                                     AcceptsReturn="True" 
+                                     Text="{Binding IPs, Converter={StaticResource StringToListConverter}}" 
+                                     Margin="0,0,0,10" 
+                                     Height="150" 
+                                     FontFamily="Ubuntu Mono, Consolas, monospace" 
+                                     IsVisible="{Binding #IPsCollapseButton.IsChecked}"/>
+                        </StackPanel>
 
-                <DockPanel LastChildFill="False" Margin="0,0,0,5">
-                    <TextBlock Text="SHA256 Hashes" Classes="Label" DockPanel.Dock="Left"/>
-                    <Button Content="Clear" Command="{Binding ClearSHA256HashesCommand}" Classes="ClearButton" DockPanel.Dock="Right"/>
-                </DockPanel>
-                <TextBox Watermark="Enter SHA256 Hashes (newline-separated)" AcceptsReturn="True" Text="{Binding SHA256Hashes, Converter={StaticResource StringToListConverter}}" Margin="0,0,0,10" Height="150" FontFamily="Ubuntu Mono, Consolas, monospace"/>
+                        <!-- MD5 Hashes Section -->
+                        <StackPanel Margin="0,0,0,5">
+                            <DockPanel LastChildFill="False" Margin="0,0,0,2">
+                                <TextBlock Text="MD5 Hashes" Classes="Label" DockPanel.Dock="Left"/>
+                                <ToggleButton Name="MD5CollapseButton" Classes="CollapseButton" IsChecked="{Binding IsMD5Collapsed, Mode=TwoWay}" Margin="0,0,10,0" DockPanel.Dock="Right"/>
+                                <Border Background="#30000000" CornerRadius="8" Margin="0,0,5,0" Padding="2" DockPanel.Dock="Right">
+                                    <Button Content="Clear" Command="{Binding ClearMD5HashesCommand}" Classes="ClearButton"/>
+                                </Border>
+                            </DockPanel>
+                            <TextBox Name="MD5TextBox" 
+                                     Watermark="Enter MD5 Hashes (newline-separated)" 
+                                     AcceptsReturn="True" 
+                                     Text="{Binding MD5Hashes, Converter={StaticResource StringToListConverter}}" 
+                                     Margin="0,0,0,10" 
+                                     Height="150" 
+                                     FontFamily="Ubuntu Mono, Consolas, monospace" 
+                                     IsVisible="{Binding #MD5CollapseButton.IsChecked}"/>
+                        </StackPanel>
 
-                <DockPanel LastChildFill="False" Margin="0,0,0,5">
-                    <TextBlock Text="File Names" Classes="Label" DockPanel.Dock="Left"/>
-                    <Button Content="Clear" Command="{Binding ClearFileNamesCommand}" Classes="ClearButton" DockPanel.Dock="Right"/>
-                </DockPanel>
-                <TextBox Watermark="Enter File Names (newline-separated)" AcceptsReturn="True" Text="{Binding FileNames, Converter={StaticResource StringToListConverter}}" Margin="0,0,0,10" Height="150" FontFamily="Ubuntu Mono, Consolas, monospace"/>
+                        <!-- SHA1 Hashes Section -->
+                        <StackPanel Margin="0,0,0,5">
+                            <DockPanel LastChildFill="False" Margin="0,0,0,2">
+                                <TextBlock Text="SHA1 Hashes" Classes="Label" DockPanel.Dock="Left"/>
+                                <ToggleButton Name="SHA1CollapseButton" Classes="CollapseButton" IsChecked="{Binding IsSHA1Collapsed, Mode=TwoWay}" Margin="0,0,10,0" DockPanel.Dock="Right"/>
+                                <Border Background="#30000000" CornerRadius="8" Margin="0,0,5,0" Padding="2" DockPanel.Dock="Right">
+                                    <Button Content="Clear" Command="{Binding ClearSHA1HashesCommand}" Classes="ClearButton"/>
+                                </Border>
+                            </DockPanel>
+                            <TextBox Name="SHA1TextBox" 
+                                     Watermark="Enter SHA1 Hashes (newline-separated)" 
+                                     AcceptsReturn="True" 
+                                     Text="{Binding SHA1Hashes, Converter={StaticResource StringToListConverter}}" 
+                                     Margin="0,0,0,10" 
+                                     Height="150" 
+                                     FontFamily="Ubuntu Mono, Consolas, monospace" 
+                                     IsVisible="{Binding #SHA1CollapseButton.IsChecked}"/>
+                        </StackPanel>
 
-                <DockPanel LastChildFill="False" Margin="0,0,0,5">
-                    <TextBlock Text="Commands" Classes="Label" DockPanel.Dock="Left"/>
-                    <Button Content="Clear" Command="{Binding ClearCommandsCommand}" Classes="ClearButton" DockPanel.Dock="Right"/>
-                </DockPanel>
-                <TextBox Watermark="Enter Commands (newline-separated)" AcceptsReturn="True" Text="{Binding Commands, Converter={StaticResource StringToListConverter}}" Margin="0,0,0,10" Height="150" FontFamily="Ubuntu Mono, Consolas, monospace"/>
+                        <!-- SHA256 Hashes Section -->
+                        <StackPanel Margin="0,0,0,5">
+                            <DockPanel LastChildFill="False" Margin="0,0,0,2">
+                                <TextBlock Text="SHA256 Hashes" Classes="Label" DockPanel.Dock="Left"/>
+                                <ToggleButton Name="SHA256CollapseButton" Classes="CollapseButton" IsChecked="{Binding IsSHA256Collapsed, Mode=TwoWay}" Margin="0,0,10,0" DockPanel.Dock="Right"/>
+                                <Border Background="#30000000" CornerRadius="8" Margin="0,0,5,0" Padding="2" DockPanel.Dock="Right">
+                                    <Button Content="Clear" Command="{Binding ClearSHA256HashesCommand}" Classes="ClearButton"/>
+                                </Border>
+                            </DockPanel>
+                            <TextBox Name="SHA256TextBox" 
+                                     Watermark="Enter SHA256 Hashes (newline-separated)" 
+                                     AcceptsReturn="True" 
+                                     Text="{Binding SHA256Hashes, Converter={StaticResource StringToListConverter}}" 
+                                     Margin="0,0,0,10" 
+                                     Height="150" 
+                                     FontFamily="Ubuntu Mono, Consolas, monospace" 
+                                     IsVisible="{Binding #SHA256CollapseButton.IsChecked}"/>
+                        </StackPanel>
 
-                <DockPanel LastChildFill="False" Margin="0,0,0,5">
-                    <TextBlock Text="Process Names" Classes="Label" DockPanel.Dock="Left"/>
-                    <Button Content="Clear" Command="{Binding ClearProcessNamesCommand}" Classes="ClearButton" DockPanel.Dock="Right"/>
-                </DockPanel>
-                <TextBox Watermark="Enter Process Names (newline-separated)" AcceptsReturn="True" Text="{Binding ProcessNames, Converter={StaticResource StringToListConverter}}" Margin="0,0,0,10" Height="150" FontFamily="Ubuntu Mono, Consolas, monospace"/>
+                        <!-- File Names Section -->
+                        <StackPanel Margin="0,0,0,5">
+                            <DockPanel LastChildFill="False" Margin="0,0,0,2">
+                                <TextBlock Text="File Names" Classes="Label" DockPanel.Dock="Left"/>
+                                <ToggleButton Name="FileNamesCollapseButton" Classes="CollapseButton" IsChecked="{Binding IsFileNamesCollapsed, Mode=TwoWay}" Margin="0,0,10,0" DockPanel.Dock="Right"/>
+                                <Border Background="#30000000" CornerRadius="8" Margin="0,0,5,0" Padding="2" DockPanel.Dock="Right">
+                                    <Button Content="Clear" Command="{Binding ClearFileNamesCommand}" Classes="ClearButton"/>
+                                </Border>
+                            </DockPanel>
+                            <TextBox Name="FileNamesTextBox" 
+                                     Watermark="Enter File Names (newline-separated)" 
+                                     AcceptsReturn="True" 
+                                     Text="{Binding FileNames, Converter={StaticResource StringToListConverter}}" 
+                                     Margin="0,0,0,10" 
+                                     Height="150" 
+                                     FontFamily="Ubuntu Mono, Consolas, monospace" 
+                                     IsVisible="{Binding #FileNamesCollapseButton.IsChecked}"/>
+                        </StackPanel>
 
-                <DockPanel LastChildFill="False" Margin="0,0,0,5">
-                    <TextBlock Text="File Paths" Classes="Label" DockPanel.Dock="Left"/>
-                    <Button Content="Clear" Command="{Binding ClearFilePathsCommand}" Classes="ClearButton" DockPanel.Dock="Right"/>
-                </DockPanel>
-                <TextBox Watermark="Enter File Paths (newline-separated)" AcceptsReturn="True" Text="{Binding FilePaths, Converter={StaticResource StringToListConverter}}" Margin="0,0,0,10" Height="150" FontFamily="Ubuntu Mono, Consolas, monospace"/>
-            </StackPanel>
-        </ScrollViewer>
+                        <!-- Commands Section -->
+                        <StackPanel Margin="0,0,0,5">
+                            <DockPanel LastChildFill="False" Margin="0,0,0,2">
+                                <TextBlock Text="Commands" Classes="Label" DockPanel.Dock="Left"/>
+                                <ToggleButton Name="CommandsCollapseButton" Classes="CollapseButton" IsChecked="{Binding IsCommandsCollapsed, Mode=TwoWay}" Margin="0,0,10,0" DockPanel.Dock="Right"/>
+                                <Border Background="#30000000" CornerRadius="8" Margin="0,0,5,0" Padding="2" DockPanel.Dock="Right">
+                                    <Button Content="Clear" Command="{Binding ClearCommandsCommand}" Classes="ClearButton"/>
+                                </Border>
+                            </DockPanel>
+                            <TextBox Name="CommandsTextBox" 
+                                     Watermark="Enter Commands (newline-separated)" 
+                                     AcceptsReturn="True" 
+                                     Text="{Binding Commands, Converter={StaticResource StringToListConverter}}" 
+                                     Margin="0,0,0,10" 
+                                     Height="150" 
+                                     FontFamily="Ubuntu Mono, Consolas, monospace" 
+                                     IsVisible="{Binding #CommandsCollapseButton.IsChecked}"/>
+                        </StackPanel>
 
-        <TabControl Grid.Column="1" Background="{Binding CurrentTheme.TabBackground}" Margin="20">
-            <TabItem>
-                <TabItem.Header>
-                    <TextBlock Text="SentinelOne"/>
-                </TabItem.Header>
-                <Grid RowDefinitions="Auto,Auto,Auto,*">
-                    <Button Grid.Row="0" Content="Copy to Clipboard" Command="{Binding CopySentinelOneCommand}" HorizontalAlignment="Left" Margin="10,0,0,10"/>
-                    <TextBlock Grid.Row="1" Text="{Binding SentinelOneReminder}" Foreground="Red" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding SentinelOneReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
-                    <TextBlock Grid.Row="2" Text="{Binding FilePathsReminder}" Foreground="Orange" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding FilePathsReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
-                    <Grid Grid.Row="3" ColumnDefinitions="Auto,*">
-                        <TextBlock Grid.Column="0" Text="{Binding SentinelOneQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
-                        <TextBox Grid.Column="1" Text="{Binding SentinelOneQuery}" IsReadOnly="True" Background="{Binding CurrentTheme.TextBoxBackground}" Foreground="{Binding CurrentTheme.TextForeground}" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" AcceptsReturn="True" AcceptsTab="True" TextWrapping="Wrap"/>
+                        <!-- Process Names Section -->
+                        <StackPanel Margin="0,0,0,5">
+                            <DockPanel LastChildFill="False" Margin="0,0,0,2">
+                                <TextBlock Text="Process Names" Classes="Label" DockPanel.Dock="Left"/>
+                                <ToggleButton Name="ProcessNamesCollapseButton" Classes="CollapseButton" IsChecked="{Binding IsProcessNamesCollapsed, Mode=TwoWay}" Margin="0,0,10,0" DockPanel.Dock="Right"/>
+                                <Border Background="#30000000" CornerRadius="8" Margin="0,0,5,0" Padding="2" DockPanel.Dock="Right">
+                                    <Button Content="Clear" Command="{Binding ClearProcessNamesCommand}" Classes="ClearButton"/>
+                                </Border>
+                            </DockPanel>
+                            <TextBox Name="ProcessNamesTextBox" 
+                                     Watermark="Enter Process Names (newline-separated)" 
+                                     AcceptsReturn="True" 
+                                     Text="{Binding ProcessNames, Converter={StaticResource StringToListConverter}}" 
+                                     Margin="0,0,0,10" 
+                                     Height="150" 
+                                     FontFamily="Ubuntu Mono, Consolas, monospace" 
+                                     IsVisible="{Binding #ProcessNamesCollapseButton.IsChecked}"/>
+                        </StackPanel>
+
+                        <!-- File Paths Section -->
+                        <StackPanel Margin="0,0,0,5">
+                            <DockPanel LastChildFill="False" Margin="0,0,0,2">
+                                <TextBlock Text="File Paths" Classes="Label" DockPanel.Dock="Left"/>
+                                <ToggleButton Name="FilePathsCollapseButton" Classes="CollapseButton" IsChecked="{Binding IsFilePathsCollapsed, Mode=TwoWay}" Margin="0,0,10,0" DockPanel.Dock="Right"/>
+                                <Border Background="#30000000" CornerRadius="8" Margin="0,0,5,0" Padding="2" DockPanel.Dock="Right">
+                                    <Button Content="Clear" Command="{Binding ClearFilePathsCommand}" Classes="ClearButton"/>
+                                </Border>
+                            </DockPanel>
+                            <TextBox Name="FilePathsTextBox" 
+                                     Watermark="Enter File Paths (newline-separated)" 
+                                     AcceptsReturn="True" 
+                                     Text="{Binding FilePaths, Converter={StaticResource StringToListConverter}}" 
+                                     Margin="0,0,0,10" 
+                                     Height="150" 
+                                     FontFamily="Ubuntu Mono, Consolas, monospace" 
+                                     IsVisible="{Binding #FilePathsCollapseButton.IsChecked}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+        <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+
+        <!-- Right Panel with Pseudo-Shadow -->
+        <Border Grid.Column="2" Background="#40000000" CornerRadius="10" Margin="25,25,15,25" ZIndex="0"/>
+        <Border Grid.Column="2" 
+                Background="{Binding CurrentTheme.TabBackground}" 
+                CornerRadius="8" 
+                Margin="20" 
+                ZIndex="1">
+            <TabControl>
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock Text="SentinelOne"/>
+                    </TabItem.Header>
+                    <Grid RowDefinitions="Auto,Auto,Auto,*">
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10,0,0,10">
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,10,2" Padding="2">
+                                <Button Content="Clear All" Command="{Binding ClearAllCommand}" Classes="ClearButton"/>
+                            </Border>
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,0,2" Padding="2">
+                                <Button Content="Copy to Clipboard" Command="{Binding CopySentinelOneCommand}" Classes="ClearButton"/>
+                            </Border>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="{Binding SentinelOneReminder}" Foreground="Red" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding SentinelOneReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
+                        <TextBlock Grid.Row="2" Text="{Binding FilePathsReminder}" Foreground="Orange" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding FilePathsReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
+                        <Grid Grid.Row="3" ColumnDefinitions="Auto,*">
+                            <TextBlock Grid.Column="0" Text="{Binding SentinelOneQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
+                            <Border Grid.Column="1" Background="{Binding CurrentTheme.TextBoxBackground}" BorderThickness="1" BorderBrush="#50FFFFFF" CornerRadius="6">
+                                <TextBlock x:Name="SentinelOneOutput" Classes="Output"/>
+                            </Border>
+                        </Grid>
                     </Grid>
-                </Grid>
-            </TabItem>
+                </TabItem>
 
-            <TabItem>
-                <TabItem.Header>
-                    <TextBlock Text="CrowdStrike"/>
-                </TabItem.Header>
-                <Grid RowDefinitions="Auto,Auto,*">
-                    <Button Grid.Row="0" Content="Copy to Clipboard" Command="{Binding CopyCrowdStrikeCommand}" HorizontalAlignment="Left" Margin="10,0,0,10"/>
-                    <TextBlock Grid.Row="1" Text="{Binding CrowdStrikeReminder}" Foreground="Red" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding CrowdStrikeReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
-                    <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
-                        <TextBlock Grid.Column="0" Text="{Binding CrowdStrikeQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
-                        <TextBox Grid.Column="1" Text="{Binding CrowdStrikeQuery}" IsReadOnly="True" Background="{Binding CurrentTheme.TextBoxBackground}" Foreground="{Binding CurrentTheme.TextForeground}" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" AcceptsReturn="True" AcceptsTab="True" TextWrapping="Wrap"/>
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock Text="CrowdStrike"/>
+                    </TabItem.Header>
+                    <Grid RowDefinitions="Auto,Auto,*">
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10,0,0,10">
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,10,2" Padding="2">
+                                <Button Content="Clear All" Command="{Binding ClearAllCommand}" Classes="ClearButton"/>
+                            </Border>
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,0,2" Padding="2">
+                                <Button Content="Copy to Clipboard" Command="{Binding CopyCrowdStrikeCommand}" Classes="ClearButton"/>
+                            </Border>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="{Binding CrowdStrikeReminder}" Foreground="Red" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding CrowdStrikeReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
+                        <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
+                            <TextBlock Grid.Column="0" Text="{Binding CrowdStrikeQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
+                            <Border Grid.Column="1" Background="{Binding CurrentTheme.TextBoxBackground}" BorderThickness="1" BorderBrush="#50FFFFFF" CornerRadius="6">
+                                <TextBlock x:Name="CrowdStrikeOutput" Classes="Output"/>
+                            </Border>
+                        </Grid>
                     </Grid>
-                </Grid>
-            </TabItem>
+                </TabItem>
 
-            <TabItem>
-                <TabItem.Header>
-                    <TextBlock Text="Defender"/>
-                </TabItem.Header>
-                <Grid RowDefinitions="Auto,Auto,*">
-                    <Button Grid.Row="0" Content="Copy to Clipboard" Command="{Binding CopyDefenderCommand}" HorizontalAlignment="Left" Margin="10,0,0,10"/>
-                    <TextBlock Grid.Row="1" Text="{Binding DefenderReminder}" Foreground="Red" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding DefenderReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
-                    <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
-                        <TextBlock Grid.Column="0" Text="{Binding DefenderQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
-                        <TextBox Grid.Column="1" Text="{Binding DefenderQuery}" IsReadOnly="True" Background="{Binding CurrentTheme.TextBoxBackground}" Foreground="{Binding CurrentTheme.TextForeground}" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" AcceptsReturn="True" AcceptsTab="True" TextWrapping="Wrap"/>
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock Text="Defender"/>
+                    </TabItem.Header>
+                    <Grid RowDefinitions="Auto,Auto,*">
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10,0,0,10">
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,10,2" Padding="2">
+                                <Button Content="Clear All" Command="{Binding ClearAllCommand}" Classes="ClearButton"/>
+                            </Border>
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,0,2" Padding="2">
+                                <Button Content="Copy to Clipboard" Command="{Binding CopyDefenderCommand}" Classes="ClearButton"/>
+                            </Border>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="{Binding DefenderReminder}" Foreground="Red" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding DefenderReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
+                        <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
+                            <TextBlock Grid.Column="0" Text="{Binding DefenderQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
+                            <Border Grid.Column="1" Background="{Binding CurrentTheme.TextBoxBackground}" BorderThickness="1" BorderBrush="#50FFFFFF" CornerRadius="6">
+                                <TextBlock x:Name="DefenderOutput" Classes="Output"/>
+                            </Border>
+                        </Grid>
                     </Grid>
-                </Grid>
-            </TabItem>
+                </TabItem>
 
-            <TabItem>
-                <TabItem.Header>
-                    <TextBlock Text="CB Response"/>
-                </TabItem.Header>
-                <Grid RowDefinitions="Auto,Auto,*">
-                    <Button Grid.Row="0" Content="Copy to Clipboard" Command="{Binding CopyCBResponseCommand}" HorizontalAlignment="Left" Margin="10,0,0,10"/>
-                    <TextBlock Grid.Row="1" Text="{Binding CBResponseReminder}" Foreground="Red" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding CBResponseReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
-                    <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
-                        <TextBlock Grid.Column="0" Text="{Binding CBResponseQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
-                        <TextBox Grid.Column="1" Text="{Binding CBResponseQuery}" IsReadOnly="True" Background="{Binding CurrentTheme.TextBoxBackground}" Foreground="{Binding CurrentTheme.TextForeground}" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" AcceptsReturn="True" AcceptsTab="True" TextWrapping="Wrap"/>
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock Text="CB Response"/>
+                    </TabItem.Header>
+                    <Grid RowDefinitions="Auto,Auto,*">
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10,0,0,10">
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,10,2" Padding="2">
+                                <Button Content="Clear All" Command="{Binding ClearAllCommand}" Classes="ClearButton"/>
+                            </Border>
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,0,2" Padding="2">
+                                <Button Content="Copy to Clipboard" Command="{Binding CopyCBResponseCommand}" Classes="ClearButton"/>
+                            </Border>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="{Binding CBResponseReminder}" Foreground="Red" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding CBResponseReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
+                        <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
+                            <TextBlock Grid.Column="0" Text="{Binding CBResponseQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
+                            <Border Grid.Column="1" Background="{Binding CurrentTheme.TextBoxBackground}" BorderThickness="1" BorderBrush="#50FFFFFF" CornerRadius="6">
+                                <TextBlock x:Name="CBResponseOutput" Classes="Output"/>
+                            </Border>
+                        </Grid>
                     </Grid>
-                </Grid>
-            </TabItem>
+                </TabItem>
 
-            <TabItem>
-                <TabItem.Header>
-                    <TextBlock Text="CB Cloud"/>
-                </TabItem.Header>
-                <Grid RowDefinitions="Auto,Auto,*">
-                    <Button Grid.Row="0" Content="Copy to Clipboard" Command="{Binding CopyCBCloudCommand}" HorizontalAlignment="Left" Margin="10,0,0,10"/>
-                    <TextBlock Grid.Row="1" Text="{Binding CBCloudReminder}" Foreground="Red" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding CBCloudReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
-                    <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
-                        <TextBlock Grid.Column="0" Text="{Binding CBCloudQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
-                        <TextBox Grid.Column="1" Text="{Binding CBCloudQuery}" IsReadOnly="True" Background="{Binding CurrentTheme.TextBoxBackground}" Foreground="{Binding CurrentTheme.TextForeground}" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" AcceptsReturn="True" AcceptsTab="True" TextWrapping="Wrap"/>
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock Text="CB Cloud"/>
+                    </TabItem.Header>
+                    <Grid RowDefinitions="Auto,Auto,*">
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10,0,0,10">
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,10,2" Padding="2">
+                                <Button Content="Clear All" Command="{Binding ClearAllCommand}" Classes="ClearButton"/>
+                            </Border>
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,0,2" Padding="2">
+                                <Button Content="Copy to Clipboard" Command="{Binding CopyCBCloudCommand}" Classes="ClearButton"/>
+                            </Border>
+                        </StackPanel>
+                        <TextBlock Grid.Row="1" Text="{Binding CBCloudReminder}" Foreground="Red" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding CBCloudReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
+                        <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
+                            <TextBlock Grid.Column="0" Text="{Binding CBCloudQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
+                            <Border Grid.Column="1" Background="{Binding CurrentTheme.TextBoxBackground}" BorderThickness="1" BorderBrush="#50FFFFFF" CornerRadius="6">
+                                <TextBlock x:Name="CBCloudOutput" Classes="Output"/>
+                            </Border>
+                        </Grid>
                     </Grid>
-                </Grid>
-            </TabItem>
-        </TabControl>
+                </TabItem>
+            </TabControl>
+        </Border>
     </Grid>
 </Window>

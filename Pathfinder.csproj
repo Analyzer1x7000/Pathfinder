@@ -12,10 +12,10 @@
     <ApplicationIcon>Assets\Pathfinder.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.2.5" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.2.5" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="11.2.5" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.5" />
+    <PackageReference Include="Avalonia" Version="11.2.6" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.2.6" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="11.2.6" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.6" />
     <PackageReference Include="System.Reactive" Version="6.0.1" />
     <AvaloniaResource Include="Assets\Pathfinder.ico" />
   </ItemGroup>

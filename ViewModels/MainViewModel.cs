@@ -18,15 +18,19 @@ namespace Pathfinder.ViewModels
         private ISolidColorBrush _tabBackground;
         private ISolidColorBrush _textBoxBackground;
         private ISolidColorBrush _textForeground;
+        private ISolidColorBrush _buttonBackground;
+        private ISolidColorBrush _buttonForeground;
         private string _inputFontFamily;
 
-        public Theme(string name, string panelBackground, string tabBackground, string textBoxBackground, string textForeground, string inputFontFamily)
+        public Theme(string name, string panelBackground, string tabBackground, string textBoxBackground, string textForeground, string buttonBackground, string buttonForeground, string inputFontFamily)
         {
             _name = name;
             _panelBackground = new SolidColorBrush(Color.Parse(panelBackground));
             _tabBackground = new SolidColorBrush(Color.Parse(tabBackground));
             _textBoxBackground = new SolidColorBrush(Color.Parse(textBoxBackground));
             _textForeground = new SolidColorBrush(Color.Parse(textForeground));
+            _buttonBackground = new SolidColorBrush(Color.Parse(buttonBackground));
+            _buttonForeground = new SolidColorBrush(Color.Parse(buttonForeground));
             _inputFontFamily = inputFontFamily;
         }
 
@@ -60,6 +64,18 @@ namespace Pathfinder.ViewModels
             set => this.RaiseAndSetIfChanged(ref _textForeground, value);
         }
 
+        public ISolidColorBrush ButtonBackground
+        {
+            get => _buttonBackground;
+            set => this.RaiseAndSetIfChanged(ref _buttonBackground, value);
+        }
+
+        public ISolidColorBrush ButtonForeground
+        {
+            get => _buttonForeground;
+            set => this.RaiseAndSetIfChanged(ref _buttonForeground, value);
+        }
+
         public string InputFontFamily
         {
             get => _inputFontFamily;
@@ -81,7 +97,18 @@ namespace Pathfinder.ViewModels
         private ObservableCollection<string> _processNames = new();
         private ObservableCollection<string> _filePaths = new();
 
-        private Theme _currentTheme;
+        private Theme? _currentTheme;
+
+        // Individual collapse states for each section
+        private bool _isDomainsCollapsed = true;
+        private bool _isIPsCollapsed = true;
+        private bool _isMD5Collapsed = true;
+        private bool _isSHA1Collapsed = true;
+        private bool _isSHA256Collapsed = true;
+        private bool _isFileNamesCollapsed = true;
+        private bool _isCommandsCollapsed = true;
+        private bool _isProcessNamesCollapsed = true;
+        private bool _isFilePathsCollapsed = true;
 
         public ObservableCollection<string> Domains { get => _domains; set => this.RaiseAndSetIfChanged(ref _domains, value); }
         public ObservableCollection<string> IPs { get => _ips; set => this.RaiseAndSetIfChanged(ref _ips, value); }
@@ -129,7 +156,61 @@ namespace Pathfinder.ViewModels
         public bool IsCopiedCBResponse { get => _isCopiedCBResponse; set => this.RaiseAndSetIfChanged(ref _isCopiedCBResponse, value); }
         public bool IsCopiedCBCloud { get => _isCopiedCBCloud; set => this.RaiseAndSetIfChanged(ref _isCopiedCBCloud, value); }
 
-        public Theme CurrentTheme
+        public bool IsDomainsCollapsed
+        {
+            get => _isDomainsCollapsed;
+            set => this.RaiseAndSetIfChanged(ref _isDomainsCollapsed, value);
+        }
+
+        public bool IsIPsCollapsed
+        {
+            get => _isIPsCollapsed;
+            set => this.RaiseAndSetIfChanged(ref _isIPsCollapsed, value);
+        }
+
+        public bool IsMD5Collapsed
+        {
+            get => _isMD5Collapsed;
+            set => this.RaiseAndSetIfChanged(ref _isMD5Collapsed, value);
+        }
+
+        public bool IsSHA1Collapsed
+        {
+            get => _isSHA1Collapsed;
+            set => this.RaiseAndSetIfChanged(ref _isSHA1Collapsed, value);
+        }
+
+        public bool IsSHA256Collapsed
+        {
+            get => _isSHA256Collapsed;
+            set => this.RaiseAndSetIfChanged(ref _isSHA256Collapsed, value);
+        }
+
+        public bool IsFileNamesCollapsed
+        {
+            get => _isFileNamesCollapsed;
+            set => this.RaiseAndSetIfChanged(ref _isFileNamesCollapsed, value);
+        }
+
+        public bool IsCommandsCollapsed
+        {
+            get => _isCommandsCollapsed;
+            set => this.RaiseAndSetIfChanged(ref _isCommandsCollapsed, value);
+        }
+
+        public bool IsProcessNamesCollapsed
+        {
+            get => _isProcessNamesCollapsed;
+            set => this.RaiseAndSetIfChanged(ref _isProcessNamesCollapsed, value);
+        }
+
+        public bool IsFilePathsCollapsed
+        {
+            get => _isFilePathsCollapsed;
+            set => this.RaiseAndSetIfChanged(ref _isFilePathsCollapsed, value);
+        }
+
+        public Theme? CurrentTheme
         {
             get => _currentTheme;
             set => this.RaiseAndSetIfChanged(ref _currentTheme, value);
@@ -150,18 +231,20 @@ namespace Pathfinder.ViewModels
         public ICommand ClearCommandsCommand { get; }
         public ICommand ClearProcessNamesCommand { get; }
         public ICommand ClearFilePathsCommand { get; }
+        public ICommand ClearAllCommand { get; }
+        public ICommand CollapseAllCommand { get; }
 
-        public ICommand SetOnyxThemeCommand { get; }
+        public ICommand SetNightShiftThemeCommand { get; }
         public ICommand SetMatrixThemeCommand { get; }
         public ICommand SetStrawberryMilkshakeThemeCommand { get; }
         public ICommand SetWindows95ThemeCommand { get; }
+        public ICommand SetDayShiftThemeCommand { get; }
 
         public MainViewModel(Window window)
         {
             _window = window ?? throw new ArgumentNullException(nameof(window));
 
-            // Initialize themes
-            CurrentTheme = new Theme("Onyx", "#1A1A1A", "#333333", "#222222", "White", "JetBrains Mono, Consolas, Ubuntu Mono");
+            CurrentTheme = new Theme("Night Shift", "#1A1A1A", "#333333", "#222222", "White", "#333333", "#D3D3D3", "JetBrains Mono, Consolas, Ubuntu Mono");
 
             this.WhenAnyValue(
                 x => x.Domains,
@@ -199,12 +282,14 @@ namespace Pathfinder.ViewModels
             ClearCommandsCommand = new RelayCommand(() => { Commands.Clear(); this.RaisePropertyChanged(nameof(Commands)); });
             ClearProcessNamesCommand = new RelayCommand(() => { ProcessNames.Clear(); this.RaisePropertyChanged(nameof(ProcessNames)); });
             ClearFilePathsCommand = new RelayCommand(() => { FilePaths.Clear(); this.RaisePropertyChanged(nameof(FilePaths)); });
+            ClearAllCommand = new RelayCommand(ClearAll);
+            CollapseAllCommand = new RelayCommand(CollapseAll);
 
-            // Theme commands
-            SetOnyxThemeCommand = new RelayCommand(() => CurrentTheme = new Theme("Onyx", "#1A1A1A", "#333333", "#222222", "White", "JetBrains Mono, Consolas, Ubuntu Mono"));
-            SetMatrixThemeCommand = new RelayCommand(() => CurrentTheme = new Theme("Matrix", "#000000", "#1C2526", "#0A0A0A", "#00FF00", "IBM Plex Mono, Consolas, Ubuntu Mono"));
-            SetStrawberryMilkshakeThemeCommand = new RelayCommand(() => CurrentTheme = new Theme("Strawberry Milkshake", "#FF9999", "#FF6666", "#FFCCCC", "White", "Source Code Pro, Consolas, Ubuntu Mono"));
-            SetWindows95ThemeCommand = new RelayCommand(() => CurrentTheme = new Theme("Windows 95", "#C0C0C0", "#008080", "#FFFFFF", "Black", "Courier New, Consolas, Ubuntu Mono"));
+            SetNightShiftThemeCommand = new RelayCommand(() => CurrentTheme = new Theme("Night Shift", "#1A1A1A", "#333333", "#222222", "White", "#333333", "#D3D3D3", "JetBrains Mono, Consolas, Ubuntu Mono"));
+            SetMatrixThemeCommand = new RelayCommand(() => CurrentTheme = new Theme("Matrix", "#000000", "#1C2526", "#0A0A0A", "#00FF00", "#1C2526", "#00FF00", "IBM Plex Mono, Consolas, Ubuntu Mono"));
+            SetStrawberryMilkshakeThemeCommand = new RelayCommand(() => CurrentTheme = new Theme("Strawberry Milkshake", "#FF9999", "#FF6666", "#FFCCCC", "#5E2A2A", "#FF6666", "#FFFFFF", "Source Code Pro, Consolas, Ubuntu Mono"));
+            SetWindows95ThemeCommand = new RelayCommand(() => CurrentTheme = new Theme("Windows 95", "#C0C0C0", "#008080", "#FFFFFF", "#000080", "#C0C0C0", "#000080", "Courier New, Consolas, Ubuntu Mono"));
+            SetDayShiftThemeCommand = new RelayCommand(() => CurrentTheme = new Theme("Day Shift", "#F0F0F0", "#FFFFFF", "#E8ECEF", "#000000", "#F5F5F5", "#000000", "JetBrains Mono, Consolas, Ubuntu Mono"));
         }
 
         private void UpdateQueries()
@@ -214,6 +299,41 @@ namespace Pathfinder.ViewModels
             DefenderQuery = BuildDefenderQuery();
             CBResponseQuery = BuildCBResponseQuery();
             CBCloudQuery = BuildCBCloudQuery();
+        }
+
+        private void ClearAll()
+        {
+            Domains.Clear();
+            IPs.Clear();
+            MD5Hashes.Clear();
+            SHA1Hashes.Clear();
+            SHA256Hashes.Clear();
+            FileNames.Clear();
+            Commands.Clear();
+            ProcessNames.Clear();
+            FilePaths.Clear();
+            this.RaisePropertyChanged(nameof(Domains));
+            this.RaisePropertyChanged(nameof(IPs));
+            this.RaisePropertyChanged(nameof(MD5Hashes));
+            this.RaisePropertyChanged(nameof(SHA1Hashes));
+            this.RaisePropertyChanged(nameof(SHA256Hashes));
+            this.RaisePropertyChanged(nameof(FileNames));
+            this.RaisePropertyChanged(nameof(Commands));
+            this.RaisePropertyChanged(nameof(ProcessNames));
+            this.RaisePropertyChanged(nameof(FilePaths));
+        }
+
+        private void CollapseAll()
+        {
+            IsDomainsCollapsed = false;
+            IsIPsCollapsed = false;
+            IsMD5Collapsed = false;
+            IsSHA1Collapsed = false;
+            IsSHA256Collapsed = false;
+            IsFileNamesCollapsed = false;
+            IsCommandsCollapsed = false;
+            IsProcessNamesCollapsed = false;
+            IsFilePathsCollapsed = false;
         }
 
         private string BuildSentinelOneQuery()
@@ -358,11 +478,11 @@ namespace Pathfinder.ViewModels
 
             if (FilePaths.Any())
             {
-                var pathConditions = string.Join(" OR ", FilePaths.Select(p => $"FilePath like \"{(p)}\"")); // Removed extra backslash escaping
+                var pathConditions = string.Join(" OR ", FilePaths.Select(p => $"FilePath like \"{(p)}\"")); 
                 parts.Add($"({pathConditions})");
             }
 
-            return parts.Any() ? string.Join(" OR ", parts) : "No IOCs entered"; // LAST EDIT HERE
+            return parts.Any() ? string.Join(" OR ", parts) : "No IOCs entered";
         }
 
         private string BuildDefenderQuery()
