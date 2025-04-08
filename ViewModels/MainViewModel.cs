@@ -110,8 +110,19 @@ namespace Pathfinder.ViewModels
         private bool _isProcessNamesCollapsed = true;
         private bool _isFilePathsCollapsed = true;
 
-        public ObservableCollection<string> Domains { get => _domains; set => this.RaiseAndSetIfChanged(ref _domains, value); }
-        public ObservableCollection<string> IPs { get => _ips; set => this.RaiseAndSetIfChanged(ref _ips, value); }
+        public ObservableCollection<string> Domains
+        {
+            get => _domains;
+            set => this.RaiseAndSetIfChanged(ref _domains, new ObservableCollection<string>(
+                value.Select(d => d.Replace("[", "").Replace("]", "")
+                                .Replace("hxxps://", "https://")
+                                .Replace("hxxp://", "http://"))));
+        }
+        public ObservableCollection<string> IPs
+        {
+            get => _ips;
+            set => this.RaiseAndSetIfChanged(ref _ips, new ObservableCollection<string>(value.Select(ip => ip.Replace("[", "").Replace("]", ""))));
+        }
         public ObservableCollection<string> MD5Hashes { get => _md5Hashes; set => this.RaiseAndSetIfChanged(ref _md5Hashes, value); }
         public ObservableCollection<string> SHA1Hashes { get => _sha1Hashes; set => this.RaiseAndSetIfChanged(ref _sha1Hashes, value); }
         public ObservableCollection<string> SHA256Hashes { get => _sha256Hashes; set => this.RaiseAndSetIfChanged(ref _sha256Hashes, value); }
@@ -288,8 +299,8 @@ namespace Pathfinder.ViewModels
             SetNightShiftThemeCommand = new RelayCommand(() => CurrentTheme = new Theme("Night Shift", "#1A1A1A", "#333333", "#222222", "White", "#333333", "#D3D3D3", "JetBrains Mono, Consolas, Ubuntu Mono"));
             SetMatrixThemeCommand = new RelayCommand(() => CurrentTheme = new Theme("Matrix", "#000000", "#1C2526", "#0A0A0A", "#00FF00", "#1C2526", "#00FF00", "IBM Plex Mono, Consolas, Ubuntu Mono"));
             SetStrawberryMilkshakeThemeCommand = new RelayCommand(() => CurrentTheme = new Theme("Strawberry Milkshake", "#FF9999", "#FF6666", "#FFCCCC", "#5E2A2A", "#FF6666", "#FFFFFF", "Source Code Pro, Consolas, Ubuntu Mono"));
-            SetWindows95ThemeCommand = new RelayCommand(() => CurrentTheme = new Theme("Windows 95", "#C0C0C0", "#008080", "#FFFFFF", "#000080", "#C0C0C0", "#000080", "Courier New, Consolas, Ubuntu Mono"));
-            SetDayShiftThemeCommand = new RelayCommand(() => CurrentTheme = new Theme("Day Shift", "#F0F0F0", "#FFFFFF", "#E8ECEF", "#000000", "#F5F5F5", "#000000", "JetBrains Mono, Consolas, Ubuntu Mono"));
+            SetWindows95ThemeCommand = new RelayCommand(() => CurrentTheme = new Theme("Windows 95", "#C0C0C0", "#008080", "#FFFFFF", "#000080", "#C0C0C0", "#FFFFFF", "Courier New, Consolas, Ubuntu Mono"));
+            SetDayShiftThemeCommand = new RelayCommand(() => CurrentTheme = new Theme("Day Shift", "#F0F0F0", "#FFFFFF", "#E8ECEF", "#000000", "#F5F5F5", "#FFFFFF", "JetBrains Mono, Consolas, Ubuntu Mono"));
         }
 
         private void UpdateQueries()
@@ -467,7 +478,7 @@ namespace Pathfinder.ViewModels
             if (FileNames.Any())
             {
                 var fileConditions = string.Join(" OR ", FileNames.Select(f => $"FileName like \"{f}\" OR TargetFileName like \"{f}\""));
-                parts.Add($"(#event_simpleName = \"File Writ*\" AND ({fileConditions}))");
+                parts.Add($"(#event_simpleName = \"*ileWrite*\" AND ({fileConditions}))");
             }
 
             if (Commands.Any())
