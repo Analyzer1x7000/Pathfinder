@@ -67,11 +67,11 @@ namespace Pathfinder
             if (textBlock == null || string.IsNullOrEmpty(query)) return;
 
             textBlock.Inlines!.Clear();
-            var parts = query.Split(new[] { " OR ", ",\n" }, StringSplitOptions.RemoveEmptyEntries)
-                            .Where(p => !string.IsNullOrWhiteSpace(p))
-                            .ToList();
 
-            bool highlight = true; // Start with highlighting for the first part
+            // Split on top-level AND/OR while preserving nested parentheses
+            var parts = SplitQuery(query);
+            bool highlight = true;
+
             foreach (var part in parts)
             {
                 var highlightBrush = GetHighlightBrush(viewModel.CurrentTheme!);
@@ -81,22 +81,53 @@ namespace Pathfinder
                     Foreground = viewModel.CurrentTheme!.TextForeground
                 };
                 textBlock.Inlines.Add(run);
-                if (part != parts.Last()) textBlock.Inlines.Add(new Run(" OR ") { Foreground = viewModel.CurrentTheme!.TextForeground });
-                highlight = !highlight; // Toggle for binary effect
+                if (part != parts.Last())
+                {
+                    var separator = query.Contains(" AND ") && query.IndexOf(" AND ") < query.IndexOf(" OR ", StringComparison.OrdinalIgnoreCase) ? " AND " : " OR ";
+                    textBlock.Inlines.Add(new Run(separator) { Foreground = viewModel.CurrentTheme!.TextForeground });
+                }
+                highlight = !highlight;
             }
         }
 
-            private ISolidColorBrush GetHighlightBrush(Theme theme)
+        private System.Collections.Generic.List<string> SplitQuery(string query)
+        {
+            var parts = new System.Collections.Generic.List<string>();
+            int start = 0;
+            int parenCount = 0;
+
+            for (int i = 0; i < query.Length; i++)
             {
-                return theme.Name switch
+                if (query[i] == '(') parenCount++;
+                else if (query[i] == ')') parenCount--;
+
+                if (parenCount == 0 && (query.Substring(i).StartsWith(" AND ") || query.Substring(i).StartsWith(" OR ")))
                 {
-                    "Night Shift" => new SolidColorBrush(Color.Parse("#2A2A2A")), // Same as Onyx, contrasts with #222222
-                    "Matrix" => new SolidColorBrush(Color.Parse("#143C3C")), // Dark teal, contrasts with #0A0A0A
-                    "Strawberry Milkshake" => new SolidColorBrush(Color.Parse("#FFAAAA")), // Light pink, contrasts with #FFCCCC
-                    "Windows 95" => new SolidColorBrush(Color.Parse("#D3D3D3")), // Light gray, contrasts with #FFFFFF
-                    "Day Shift" => new SolidColorBrush(Color.Parse("#CCD1D9")), // Medium gray, contrasts with #E8ECEF and black text
-                    _ => new SolidColorBrush(Color.Parse("#2A2A2A")) // Fallback
-                };
+                    parts.Add(query.Substring(start, i - start));
+                    start = i + (query[i] == 'A' ? 5 : 4); // Skip " AND " or " OR "
+                    i = start - 1; // Reset to continue from new start
+                }
             }
+
+            if (start < query.Length)
+            {
+                parts.Add(query.Substring(start));
+            }
+
+            return parts;
+        }
+
+        private ISolidColorBrush GetHighlightBrush(Theme theme)
+        {
+            return theme.Name switch
+            {
+                "Night Shift" => new SolidColorBrush(Color.Parse("#2A2A2A")), // Same as Onyx, contrasts with #222222
+                "Matrix" => new SolidColorBrush(Color.Parse("#143C3C")), // Dark teal, contrasts with #0A0A0A
+                "Strawberry Milkshake" => new SolidColorBrush(Color.Parse("#FFAAAA")), // Light pink, contrasts with #FFCCCC
+                "Windows 95" => new SolidColorBrush(Color.Parse("#D3D3D3")), // Light gray, contrasts with #FFFFFF
+                "Day Shift" => new SolidColorBrush(Color.Parse("#CCD1D9")), // Medium gray, contrasts with #E8ECEF and black text
+                _ => new SolidColorBrush(Color.Parse("#2A2A2A")) // Fallback
+            };
+        }
     }
 }

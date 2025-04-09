@@ -132,6 +132,12 @@
             <Setter Property="TextWrapping" Value="Wrap"/>
             <Setter Property="Padding" Value="4"/>
         </Style>
+        <Style Selector="TextBox /template/ TextBlock#PART_Watermark">
+            <Setter Property="FontFamily" Value="Ubuntu Mono, Consolas, monospace"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="{Binding CurrentTheme.TextForeground}"/>
+            <Setter Property="Opacity" Value="0.5"/>
+        </Style>
     </Window.Styles>
     <Grid Background="{Binding CurrentTheme.PanelBackground}">
         <Grid.ColumnDefinitions>
@@ -186,7 +192,7 @@
                                 </Border>
                             </DockPanel>
                             <TextBox Name="DomainsTextBox" 
-                                     Watermark="Enter Domains (newline-separated)" 
+                                     Watermark="cyberkiller.xyz&#x0a;rtsc.live&#x0a;americajobmail.site" 
                                      AcceptsReturn="True" 
                                      Text="{Binding Domains, Converter={StaticResource StringToListConverter}}" 
                                      Margin="0,0,0,10" 
@@ -205,7 +211,7 @@
                                 </Border>
                             </DockPanel>
                             <TextBox Name="IPsTextBox" 
-                                     Watermark="Enter IPs (newline-separated)" 
+                                     Watermark="8.8.8.8&#x0a;192.168.0.1&#x0a;127.0.0.1" 
                                      AcceptsReturn="True" 
                                      Text="{Binding IPs, Converter={StaticResource StringToListConverter}}" 
                                      Margin="0,0,0,10" 
@@ -224,7 +230,7 @@
                                 </Border>
                             </DockPanel>
                             <TextBox Name="MD5TextBox" 
-                                     Watermark="Enter MD5 Hashes (newline-separated)" 
+                                     Watermark="a1f5e7b9d2c3f4a5b6c7d8e9f0a1b2c3&#x0a;4c3b2a1908f7e6d5c4b3a291087f6e5d&#x0a;9b8a7c6d5e4f3a2b1c0d9e8f7a6b5c4d" 
                                      AcceptsReturn="True" 
                                      Text="{Binding MD5Hashes, Converter={StaticResource StringToListConverter}}" 
                                      Margin="0,0,0,10" 
@@ -243,7 +249,7 @@
                                 </Border>
                             </DockPanel>
                             <TextBox Name="SHA1TextBox" 
-                                     Watermark="Enter SHA1 Hashes (newline-separated)" 
+                                     Watermark="a3f1c5b7d9e2f0a4b6c8d1e3f5a7c9b2d4e6f8a0&#x0a;1b2c3d4e5f60718293a4b5c6d7e8f9a0b1c2d3e4&#x0a;abcdef1234567890abcdef1234567890abcdef12" 
                                      AcceptsReturn="True" 
                                      Text="{Binding SHA1Hashes, Converter={StaticResource StringToListConverter}}" 
                                      Margin="0,0,0,10" 
@@ -262,7 +268,7 @@
                                 </Border>
                             </DockPanel>
                             <TextBox Name="SHA256TextBox" 
-                                     Watermark="Enter SHA256 Hashes (newline-separated)" 
+                                     Watermark="a3f1c5b7d9e2f0a4b6c8d1e3f5a7c9b2d4e6f8a0a3f1c5b7d9e2f0a4b6c8d1e3&#x0a;1b2c3d4e5f60718293a4b5c6d7e8f9a0b1c2d3e41b2c3d4e5f60718293a4b5c6&#x0a;abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890" 
                                      AcceptsReturn="True" 
                                      Text="{Binding SHA256Hashes, Converter={StaticResource StringToListConverter}}" 
                                      Margin="0,0,0,10" 
@@ -281,7 +287,7 @@
                                 </Border>
                             </DockPanel>
                             <TextBox Name="FileNamesTextBox" 
-                                     Watermark="Enter File Names (newline-separated)" 
+                                     Watermark="xxx.exe&#x0a;MSI0871.tmp&#x0a;svhost.dll" 
                                      AcceptsReturn="True" 
                                      Text="{Binding FileNames, Converter={StaticResource StringToListConverter}}" 
                                      Margin="0,0,0,10" 
@@ -300,7 +306,7 @@
                                 </Border>
                             </DockPanel>
                             <TextBox Name="CommandsTextBox" 
-                                     Watermark="Enter Commands (newline-separated)" 
+                                     Watermark="iwr&#x0a;Invoke-Kerberoast&#x0a;lsadump" 
                                      AcceptsReturn="True" 
                                      Text="{Binding Commands, Converter={StaticResource StringToListConverter}}" 
                                      Margin="0,0,0,10" 
@@ -319,7 +325,7 @@
                                 </Border>
                             </DockPanel>
                             <TextBox Name="ProcessNamesTextBox" 
-                                     Watermark="Enter Process Names (newline-separated)" 
+                                     Watermark="wscript.exe&#x0a;word.exe&#x0a;csc.exe" 
                                      AcceptsReturn="True" 
                                      Text="{Binding ProcessNames, Converter={StaticResource StringToListConverter}}" 
                                      Margin="0,0,0,10" 
@@ -338,13 +344,31 @@
                                 </Border>
                             </DockPanel>
                             <TextBox Name="FilePathsTextBox" 
-                                     Watermark="Enter File Paths (newline-separated)" 
+                                     Watermark="AppData\Local&#x0a;Users\Public&#x0a;C:\Temp" 
                                      AcceptsReturn="True" 
                                      Text="{Binding FilePaths, Converter={StaticResource StringToListConverter}}" 
                                      Margin="0,0,0,10" 
                                      Height="150" 
                                      FontFamily="Ubuntu Mono, Consolas, monospace" 
                                      IsVisible="{Binding #FilePathsCollapseButton.IsChecked}"/>
+                        </StackPanel>
+                        <!-- Loaded DLLs Section -->
+                        <StackPanel Margin="0,0,0,5">
+                            <DockPanel LastChildFill="False" Margin="0,0,0,2">
+                                <TextBlock Text="Loaded DLLs" Classes="Label" DockPanel.Dock="Left"/>
+                                <ToggleButton Name="LoadedDLLsCollapseButton" Classes="CollapseButton" IsChecked="{Binding IsLoadedDLLsCollapsed, Mode=TwoWay}" Margin="0,0,10,0" DockPanel.Dock="Right"/>
+                                <Border Background="#30000000" CornerRadius="8" Margin="0,0,5,0" Padding="2" DockPanel.Dock="Right">
+                                    <Button Content="Clear" Command="{Binding ClearLoadedDLLsCommand}" Classes="ClearButton"/>
+                                </Border>
+                            </DockPanel>
+                            <TextBox Name="LoadedDLLsTextBox" 
+                                    Watermark="kernel32.dll&#x0a;user32.dll&#x0a;ntdll.dll" 
+                                    AcceptsReturn="True" 
+                                    Text="{Binding LoadedDLLs, Converter={StaticResource StringToListConverter}}" 
+                                    Margin="0,0,0,10" 
+                                    Height="150" 
+                                    FontFamily="Ubuntu Mono, Consolas, monospace" 
+                                    IsVisible="{Binding #LoadedDLLsCollapseButton.IsChecked}"/>
                         </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
@@ -366,14 +390,44 @@
                         <TextBlock Text="SentinelOne"/>
                     </TabItem.Header>
                     <Grid RowDefinitions="Auto,Auto,Auto,*">
-                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10,0,0,10">
-                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,10,2" Padding="2">
+                        <DockPanel Grid.Row="0" Margin="10,0,0,10" LastChildFill="False">
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,10,2" Padding="2" DockPanel.Dock="Left">
                                 <Button Content="Clear All" Command="{Binding ClearAllCommand}" Classes="ClearButton"/>
                             </Border>
-                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,0,2" Padding="2">
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,10,2" Padding="2" DockPanel.Dock="Left">
                                 <Button Content="Copy to Clipboard" Command="{Binding CopySentinelOneCommand}" Classes="ClearButton"/>
                             </Border>
-                        </StackPanel>
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,0,2" Padding="2" DockPanel.Dock="Right">
+                                <Button Content="Clear" Command="{Binding ClearHostnameCommand}" Classes="ClearButton"/>
+                            </Border>
+                            <TextBox Name="SentinelOneHostnameTextBox" 
+                                    Watermark="Hostname (max 25 chars)" 
+                                    MaxLength="25" 
+                                    AcceptsReturn="False" 
+                                    Text="{Binding Hostname}" 
+                                    Width="200" 
+                                    FontFamily="Ubuntu Mono, Consolas, monospace" 
+                                    FontSize="12" 
+                                    Background="{Binding CurrentTheme.TextBoxBackground}" 
+                                    Foreground="{Binding CurrentTheme.TextForeground}" 
+                                    Margin="10,0,10,0" 
+                                    DockPanel.Dock="Right"/>
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,0,2" Padding="2" DockPanel.Dock="Right">
+                                <Button Content="Clear" Command="{Binding ClearUsernameCommand}" Classes="ClearButton"/>
+                            </Border>
+                            <TextBox Name="SentinelOneUsernameTextBox" 
+                                Watermark="Username (max 25 chars)" 
+                                MaxLength="25" 
+                                AcceptsReturn="False" 
+                                Text="{Binding Username}" 
+                                Width="200" 
+                                FontFamily="Ubuntu Mono, Consolas, monospace" 
+                                FontSize="12" 
+                                Background="{Binding CurrentTheme.TextBoxBackground}" 
+                                Foreground="{Binding CurrentTheme.TextForeground}" 
+                                Margin="0,0,10,0" 
+                                DockPanel.Dock="Right"/>
+                        </DockPanel>
                         <TextBlock Grid.Row="1" Text="{Binding SentinelOneReminder}" Foreground="Red" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding SentinelOneReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
                         <TextBlock Grid.Row="2" Text="{Binding FilePathsReminder}" Foreground="Orange" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding FilePathsReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
                         <Grid Grid.Row="3" ColumnDefinitions="Auto,*">
@@ -390,15 +444,45 @@
                         <TextBlock Text="CrowdStrike"/>
                     </TabItem.Header>
                     <Grid RowDefinitions="Auto,Auto,*">
-                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10,0,0,10">
-                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,10,2" Padding="2">
+                        <DockPanel Grid.Row="0" LastChildFill="False" Margin="10,0,0,10">
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,10,2" Padding="2" DockPanel.Dock="Left">
                                 <Button Content="Clear All" Command="{Binding ClearAllCommand}" Classes="ClearButton"/>
                             </Border>
-                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,0,2" Padding="2">
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,10,2" Padding="2" DockPanel.Dock="Left">
                                 <Button Content="Copy to Clipboard" Command="{Binding CopyCrowdStrikeCommand}" Classes="ClearButton"/>
                             </Border>
-                        </StackPanel>
-                        <TextBlock Grid.Row="1" Text="{Binding CrowdStrikeReminder}" Foreground="Red" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding CrowdStrikeReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,0,2" Padding="2" DockPanel.Dock="Right">
+                                <Button Content="Clear" Command="{Binding ClearHostnameCommand}" Classes="ClearButton"/>
+                            </Border>
+                            <TextBox Name="CrowdStrikeHostnameTextBox" 
+                                    Watermark="Hostname (max 25 chars)" 
+                                    MaxLength="25" 
+                                    AcceptsReturn="False" 
+                                    Text="{Binding Hostname}" 
+                                    Width="200" 
+                                    FontFamily="Ubuntu Mono, Consolas, monospace" 
+                                    FontSize="12" 
+                                    Background="{Binding CurrentTheme.TextBoxBackground}" 
+                                    Foreground="{Binding CurrentTheme.TextForeground}" 
+                                    Margin="10,0,10,0" 
+                                    DockPanel.Dock="Right"/>
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,0,2" Padding="2" DockPanel.Dock="Right">
+                                <Button Content="Clear" Command="{Binding ClearUsernameCommand}" Classes="ClearButton"/>
+                            </Border>
+                            <TextBox Name="CrowdStrikeUsernameTextBox" 
+                                    Watermark="Username (max 25 chars)" 
+                                    MaxLength="25" 
+                                    AcceptsReturn="False" 
+                                    Text="{Binding Username}" 
+                                    Width="200" 
+                                    FontFamily="Ubuntu Mono, Consolas, monospace" 
+                                    FontSize="12" 
+                                    Background="{Binding CurrentTheme.TextBoxBackground}" 
+                                    Foreground="{Binding CurrentTheme.TextForeground}" 
+                                    Margin="0,0,10,0" 
+                                    DockPanel.Dock="Right"/>
+                        </DockPanel>
+                        <TextBlock Grid.Row="1" Text="{Binding CrowdStrikeReminder}" Foreground="Orange" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding CrowdStrikeReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
                         <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
                             <TextBlock Grid.Column="0" Text="{Binding CrowdStrikeQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
                             <Border Grid.Column="1" Background="{Binding CurrentTheme.TextBoxBackground}" BorderThickness="1" BorderBrush="#50FFFFFF" CornerRadius="6">
@@ -413,15 +497,45 @@
                         <TextBlock Text="Defender"/>
                     </TabItem.Header>
                     <Grid RowDefinitions="Auto,Auto,*">
-                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10,0,0,10">
-                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,10,2" Padding="2">
+                        <DockPanel Grid.Row="0" LastChildFill="False" Margin="10,0,0,10">
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,10,2" Padding="2" DockPanel.Dock="Left">
                                 <Button Content="Clear All" Command="{Binding ClearAllCommand}" Classes="ClearButton"/>
                             </Border>
-                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,0,2" Padding="2">
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,10,2" Padding="2" DockPanel.Dock="Left">
                                 <Button Content="Copy to Clipboard" Command="{Binding CopyDefenderCommand}" Classes="ClearButton"/>
                             </Border>
-                        </StackPanel>
-                        <TextBlock Grid.Row="1" Text="{Binding DefenderReminder}" Foreground="Red" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding DefenderReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,0,2" Padding="2" DockPanel.Dock="Right">
+                                <Button Content="Clear" Command="{Binding ClearHostnameCommand}" Classes="ClearButton"/>
+                            </Border>
+                            <TextBox Name="DefenderHostnameTextBox" 
+                                    Watermark="Hostname (max 25 chars)" 
+                                    MaxLength="25" 
+                                    AcceptsReturn="False" 
+                                    Text="{Binding Hostname}" 
+                                    Width="200" 
+                                    FontFamily="Ubuntu Mono, Consolas, monospace" 
+                                    FontSize="12" 
+                                    Background="{Binding CurrentTheme.TextBoxBackground}" 
+                                    Foreground="{Binding CurrentTheme.TextForeground}" 
+                                    Margin="10,0,10,0" 
+                                    DockPanel.Dock="Right"/>
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,0,2" Padding="2" DockPanel.Dock="Right">
+                                <Button Content="Clear" Command="{Binding ClearUsernameCommand}" Classes="ClearButton"/>
+                            </Border>
+                            <TextBox Name="DefenderUsernameTextBox" 
+                                    Watermark="Username (max 25 chars)" 
+                                    MaxLength="25" 
+                                    AcceptsReturn="False" 
+                                    Text="{Binding Username}" 
+                                    Width="200" 
+                                    FontFamily="Ubuntu Mono, Consolas, monospace" 
+                                    FontSize="12" 
+                                    Background="{Binding CurrentTheme.TextBoxBackground}" 
+                                    Foreground="{Binding CurrentTheme.TextForeground}" 
+                                    Margin="0,0,10,0" 
+                                    DockPanel.Dock="Right"/>
+                        </DockPanel>
+                        <TextBlock Grid.Row="1" Text="{Binding DefenderReminder}" Foreground="Orange" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding DefenderReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
                         <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
                             <TextBlock Grid.Column="0" Text="{Binding DefenderQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
                             <Border Grid.Column="1" Background="{Binding CurrentTheme.TextBoxBackground}" BorderThickness="1" BorderBrush="#50FFFFFF" CornerRadius="6">
@@ -436,14 +550,44 @@
                         <TextBlock Text="CB Response"/>
                     </TabItem.Header>
                     <Grid RowDefinitions="Auto,Auto,*">
-                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10,0,0,10">
-                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,10,2" Padding="2">
+                        <DockPanel Grid.Row="0" LastChildFill="False" Margin="10,0,0,10">
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,10,2" Padding="2" DockPanel.Dock="Left">
                                 <Button Content="Clear All" Command="{Binding ClearAllCommand}" Classes="ClearButton"/>
                             </Border>
-                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,0,2" Padding="2">
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,10,2" Padding="2" DockPanel.Dock="Left">
                                 <Button Content="Copy to Clipboard" Command="{Binding CopyCBResponseCommand}" Classes="ClearButton"/>
                             </Border>
-                        </StackPanel>
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,0,2" Padding="2" DockPanel.Dock="Right">
+                                <Button Content="Clear" Command="{Binding ClearHostnameCommand}" Classes="ClearButton"/>
+                            </Border>
+                            <TextBox Name="CBResponseHostnameTextBox" 
+                                    Watermark="Hostname (max 25 chars)" 
+                                    MaxLength="25" 
+                                    AcceptsReturn="False" 
+                                    Text="{Binding Hostname}" 
+                                    Width="200" 
+                                    FontFamily="Ubuntu Mono, Consolas, monospace" 
+                                    FontSize="12" 
+                                    Background="{Binding CurrentTheme.TextBoxBackground}" 
+                                    Foreground="{Binding CurrentTheme.TextForeground}" 
+                                    Margin="10,0,10,0" 
+                                    DockPanel.Dock="Right"/>
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,0,2" Padding="2" DockPanel.Dock="Right">
+                                <Button Content="Clear" Command="{Binding ClearUsernameCommand}" Classes="ClearButton"/>
+                            </Border>
+                            <TextBox Name="CBResponseUsernameTextBox" 
+                                Watermark="Username (max 25 chars)" 
+                                MaxLength="25" 
+                                AcceptsReturn="False" 
+                                Text="{Binding Username}" 
+                                Width="200" 
+                                FontFamily="Ubuntu Mono, Consolas, monospace" 
+                                FontSize="12" 
+                                Background="{Binding CurrentTheme.TextBoxBackground}" 
+                                Foreground="{Binding CurrentTheme.TextForeground}" 
+                                Margin="0,0,10,0" 
+                                DockPanel.Dock="Right"/>
+                        </DockPanel>
                         <TextBlock Grid.Row="1" Text="{Binding CBResponseReminder}" Foreground="Red" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding CBResponseReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
                         <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
                             <TextBlock Grid.Column="0" Text="{Binding CBResponseQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
@@ -459,14 +603,44 @@
                         <TextBlock Text="CB Cloud"/>
                     </TabItem.Header>
                     <Grid RowDefinitions="Auto,Auto,*">
-                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10,0,0,10">
-                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,10,2" Padding="2">
+                        <DockPanel Grid.Row="0" LastChildFill="False" Margin="10,0,0,10">
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,10,2" Padding="2" DockPanel.Dock="Left">
                                 <Button Content="Clear All" Command="{Binding ClearAllCommand}" Classes="ClearButton"/>
                             </Border>
-                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,0,2" Padding="2">
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,10,2" Padding="2" DockPanel.Dock="Left">
                                 <Button Content="Copy to Clipboard" Command="{Binding CopyCBCloudCommand}" Classes="ClearButton"/>
                             </Border>
-                        </StackPanel>
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,0,2" Padding="2" DockPanel.Dock="Right">
+                                <Button Content="Clear" Command="{Binding ClearHostnameCommand}" Classes="ClearButton"/>
+                            </Border>
+                            <TextBox Name="CBCloudHostnameTextBox" 
+                                    Watermark="Hostname (max 25 chars)" 
+                                    MaxLength="25" 
+                                    AcceptsReturn="False" 
+                                    Text="{Binding Hostname}" 
+                                    Width="200" 
+                                    FontFamily="Ubuntu Mono, Consolas, monospace" 
+                                    FontSize="12" 
+                                    Background="{Binding CurrentTheme.TextBoxBackground}" 
+                                    Foreground="{Binding CurrentTheme.TextForeground}" 
+                                    Margin="10,0,10,0" 
+                                    DockPanel.Dock="Right"/>
+                            <Border Background="#30000000" CornerRadius="8" Margin="0,0,0,2" Padding="2" DockPanel.Dock="Right">
+                                <Button Content="Clear" Command="{Binding ClearUsernameCommand}" Classes="ClearButton"/>
+                            </Border>
+                            <TextBox Name="CBCloudUsernameTextBox" 
+                                    Watermark="Username (max 25 chars)" 
+                                    MaxLength="25" 
+                                    AcceptsReturn="False" 
+                                    Text="{Binding Username}" 
+                                    Width="200" 
+                                    FontFamily="Ubuntu Mono, Consolas, monospace" 
+                                    FontSize="12" 
+                                    Background="{Binding CurrentTheme.TextBoxBackground}" 
+                                    Foreground="{Binding CurrentTheme.TextForeground}" 
+                                    Margin="0,0,10,0" 
+                                    DockPanel.Dock="Right"/>
+                        </DockPanel>
                         <TextBlock Grid.Row="1" Text="{Binding CBCloudReminder}" Foreground="Red" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding CBCloudReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
                         <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
                             <TextBlock Grid.Column="0" Text="{Binding CBCloudQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>

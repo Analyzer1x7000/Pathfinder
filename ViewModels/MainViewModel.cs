@@ -96,10 +96,11 @@ namespace Pathfinder.ViewModels
         private ObservableCollection<string> _commands = new();
         private ObservableCollection<string> _processNames = new();
         private ObservableCollection<string> _filePaths = new();
+        private ObservableCollection<string> _loadedDLLs = new();
+        private string _hostname = "";
 
         private Theme? _currentTheme;
 
-        // Individual collapse states for each section
         private bool _isDomainsCollapsed = true;
         private bool _isIPsCollapsed = true;
         private bool _isMD5Collapsed = true;
@@ -109,14 +110,13 @@ namespace Pathfinder.ViewModels
         private bool _isCommandsCollapsed = true;
         private bool _isProcessNamesCollapsed = true;
         private bool _isFilePathsCollapsed = true;
+        private bool _isLoadedDLLsCollapsed = true;
 
         public ObservableCollection<string> Domains
         {
             get => _domains;
             set => this.RaiseAndSetIfChanged(ref _domains, new ObservableCollection<string>(
-                value.Select(d => d.Replace("[", "").Replace("]", "")
-                                .Replace("hxxps://", "https://")
-                                .Replace("hxxp://", "http://"))));
+                value.Select(d => d.Replace("[", "").Replace("]", "").Replace("hxxps://", "https://").Replace("hxxp://", "http://"))));
         }
         public ObservableCollection<string> IPs
         {
@@ -130,6 +130,18 @@ namespace Pathfinder.ViewModels
         public ObservableCollection<string> Commands { get => _commands; set => this.RaiseAndSetIfChanged(ref _commands, value); }
         public ObservableCollection<string> ProcessNames { get => _processNames; set => this.RaiseAndSetIfChanged(ref _processNames, value); }
         public ObservableCollection<string> FilePaths { get => _filePaths; set => this.RaiseAndSetIfChanged(ref _filePaths, value); }
+        public ObservableCollection<string> LoadedDLLs { get => _loadedDLLs; set => this.RaiseAndSetIfChanged(ref _loadedDLLs, value); }
+        public string Username
+        {
+            get => _username;
+            set => this.RaiseAndSetIfChanged(ref _username, value);
+        }
+        private string _username = "";
+        public string Hostname
+        {
+            get => _hostname;
+            set => this.RaiseAndSetIfChanged(ref _hostname, value);
+        }
 
         public string SentinelOneQuery { get => _sentinelOneQuery; set => this.RaiseAndSetIfChanged(ref _sentinelOneQuery, value); }
         public string CrowdStrikeQuery { get => _crowdStrikeQuery; set => this.RaiseAndSetIfChanged(ref _crowdStrikeQuery, value); }
@@ -221,6 +233,12 @@ namespace Pathfinder.ViewModels
             set => this.RaiseAndSetIfChanged(ref _isFilePathsCollapsed, value);
         }
 
+        public bool IsLoadedDLLsCollapsed
+        {
+            get => _isLoadedDLLsCollapsed;
+            set => this.RaiseAndSetIfChanged(ref _isLoadedDLLsCollapsed, value);
+        }
+
         public Theme? CurrentTheme
         {
             get => _currentTheme;
@@ -242,6 +260,9 @@ namespace Pathfinder.ViewModels
         public ICommand ClearCommandsCommand { get; }
         public ICommand ClearProcessNamesCommand { get; }
         public ICommand ClearFilePathsCommand { get; }
+        public ICommand ClearLoadedDLLsCommand { get; }
+        public ICommand ClearHostnameCommand { get; }
+        public ICommand ClearUsernameCommand { get; }
         public ICommand ClearAllCommand { get; }
         public ICommand CollapseAllCommand { get; }
 
@@ -259,22 +280,21 @@ namespace Pathfinder.ViewModels
 
             this.WhenAnyValue(
                 x => x.Domains,
-                x => x.IPs,
-                x => x.MD5Hashes)
-                .Throttle(TimeSpan.FromMilliseconds(100))
-                .Subscribe(_ => UpdateQueries());
-
-            this.WhenAnyValue(
-                x => x.SHA1Hashes,
-                x => x.SHA256Hashes,
-                x => x.FileNames)
-                .Throttle(TimeSpan.FromMilliseconds(100))
-                .Subscribe(_ => UpdateQueries());
-
-            this.WhenAnyValue(
+                x => x.FileNames,
                 x => x.Commands,
                 x => x.ProcessNames,
-                x => x.FilePaths)
+                x => x.FilePaths,
+                x => x.Hostname,
+                x => x.Username)
+                .Throttle(TimeSpan.FromMilliseconds(100))
+                .Subscribe(_ => UpdateQueries());
+
+            this.WhenAnyValue(
+                x => x.IPs,
+                x => x.MD5Hashes,
+                x => x.SHA1Hashes,
+                x => x.SHA256Hashes,
+                x => x.LoadedDLLs)
                 .Throttle(TimeSpan.FromMilliseconds(100))
                 .Subscribe(_ => UpdateQueries());
 
@@ -293,6 +313,9 @@ namespace Pathfinder.ViewModels
             ClearCommandsCommand = new RelayCommand(() => { Commands.Clear(); this.RaisePropertyChanged(nameof(Commands)); });
             ClearProcessNamesCommand = new RelayCommand(() => { ProcessNames.Clear(); this.RaisePropertyChanged(nameof(ProcessNames)); });
             ClearFilePathsCommand = new RelayCommand(() => { FilePaths.Clear(); this.RaisePropertyChanged(nameof(FilePaths)); });
+            ClearLoadedDLLsCommand = new RelayCommand(() => { LoadedDLLs.Clear(); this.RaisePropertyChanged(nameof(LoadedDLLs)); });
+            ClearHostnameCommand = new RelayCommand(() => { Hostname = ""; this.RaisePropertyChanged(nameof(Hostname)); });
+            ClearUsernameCommand = new RelayCommand(() => { Username = ""; this.RaisePropertyChanged(nameof(Username)); });
             ClearAllCommand = new RelayCommand(ClearAll);
             CollapseAllCommand = new RelayCommand(CollapseAll);
 
@@ -323,6 +346,9 @@ namespace Pathfinder.ViewModels
             Commands.Clear();
             ProcessNames.Clear();
             FilePaths.Clear();
+            LoadedDLLs.Clear();
+            Hostname = "";
+            Username = "";
             this.RaisePropertyChanged(nameof(Domains));
             this.RaisePropertyChanged(nameof(IPs));
             this.RaisePropertyChanged(nameof(MD5Hashes));
@@ -332,6 +358,9 @@ namespace Pathfinder.ViewModels
             this.RaisePropertyChanged(nameof(Commands));
             this.RaisePropertyChanged(nameof(ProcessNames));
             this.RaisePropertyChanged(nameof(FilePaths));
+            this.RaisePropertyChanged(nameof(LoadedDLLs));
+            this.RaisePropertyChanged(nameof(Hostname));
+            this.RaisePropertyChanged(nameof(Username));
         }
 
         private void CollapseAll()
@@ -345,6 +374,7 @@ namespace Pathfinder.ViewModels
             IsCommandsCollapsed = false;
             IsProcessNamesCollapsed = false;
             IsFilePathsCollapsed = false;
+            IsLoadedDLLsCollapsed = false;
         }
 
         private string BuildSentinelOneQuery()
@@ -374,7 +404,7 @@ namespace Pathfinder.ViewModels
                 });
 
                 FilePathsReminder = hasMultipleSlashes
-                    ? "Possible multiple slashes detected in file path input. Please double check your input. The `matches` keyword in S1 Visibility requires double escaped slashes in file paths."
+                    ? "Multiple consecutive slashes detected - Pathfinder expects single slashes and adjusts output accordingly."
                     : "";
             }
             else
@@ -432,20 +462,51 @@ namespace Pathfinder.ViewModels
                 parts.Add($"({pathConditions})");
             }
 
+            if (LoadedDLLs.Any())
+            {
+                var dllConditions = string.Join(" or ", LoadedDLLs.Select(dll => $"module.path matches '{dll}'"));
+                parts.Add($"(event.type='Module Load' and ({dllConditions}))");
+            }
+
+            var userHostParts = new System.Collections.Generic.List<string>();
+            if (!string.IsNullOrEmpty(Hostname))
+            {
+                userHostParts.Add($"(endpoint.name matches \"{Hostname}\")");
+            }
+            if (!string.IsNullOrEmpty(Username))
+            {
+                userHostParts.Add($"(event.login.userName matches '{Username}' OR src.process.user matches '{Username}' OR tgt.process.user matches '{Username}' OR src.process.parent.user matches '{Username}')");
+            }
+
+            if (userHostParts.Any())
+            {
+                var userHostCondition = userHostParts.Count > 1 ? $"({string.Join(" AND ", userHostParts)})" : userHostParts[0];
+                if (parts.Any())
+                {
+                    return $"{userHostCondition} AND ({string.Join(" OR ", parts)})";
+                }
+                return userHostParts.Count > 1 ? userHostCondition : (string.IsNullOrEmpty(Hostname) ? userHostParts[0] : $"endpoint.name = \"{Hostname}\"");
+            }
+
             return parts.Any() ? string.Join(" OR ", parts) : "No IOCs entered";
         }
 
         private string BuildCrowdStrikeQuery()
         {
             var parts = new System.Collections.Generic.List<string>();
+            CrowdStrikeReminder = "";
 
-            if (ProcessNames.Any())
+            if (FilePaths.Any())
             {
-                CrowdStrikeReminder = "CrowdStrike Falcon Advanced Event Search currently supports processes by ID. Process names will be excluded from this output.";
-            }
-            else
-            {
-                CrowdStrikeReminder = "";
+                bool hasMultipleSlashes = FilePaths.Any(p => p.Contains("\\\\"));
+                if (hasMultipleSlashes)
+                {
+                    CrowdStrikeReminder = "Multiple consecutive slashes detected - Pathfinder expects single slashes and adjusts output accordingly.";
+                }
+
+                var pathConditions = string.Join(" OR ", FilePaths.Select(p => 
+                    $"FilePath like \"{p.Replace(@"\", @"\\")}\""));
+                parts.Add($"({pathConditions})");
             }
 
             if (Domains.Any())
@@ -478,7 +539,7 @@ namespace Pathfinder.ViewModels
             if (FileNames.Any())
             {
                 var fileConditions = string.Join(" OR ", FileNames.Select(f => $"FileName like \"{f}\" OR TargetFileName like \"{f}\""));
-                parts.Add($"(#event_simpleName = \"*ileWrite*\" AND ({fileConditions}))");
+                parts.Add($"(#event_simpleName = \"File Writ*\" AND ({fileConditions}))");
             }
 
             if (Commands.Any())
@@ -487,10 +548,36 @@ namespace Pathfinder.ViewModels
                 parts.Add($"(#event_simpleName = ProcessRollup2 AND ({cmdConditions}))");
             }
 
-            if (FilePaths.Any())
+            if (ProcessNames.Any())
             {
-                var pathConditions = string.Join(" OR ", FilePaths.Select(p => $"FilePath like \"{(p)}\"")); 
-                parts.Add($"({pathConditions})");
+                var processConditions = string.Join(" OR ", ProcessNames.Select(p => $"(FileName like \"{p}\" OR ParentBaseFileName like \"{p}\" OR GrandparentBaseFileName like \"{p}\")"));
+                parts.Add($"({processConditions})");
+            }
+
+            if (LoadedDLLs.Any())
+            {
+                var dllConditions = string.Join(" OR ", LoadedDLLs.Select(dll => $"FileName like \"{dll}\""));
+                parts.Add($"(#event_simpleName = \"ClassifiedModuleLoad\" AND ({dllConditions}))");
+            }
+
+            var userHostParts = new System.Collections.Generic.List<string>();
+            if (!string.IsNullOrEmpty(Hostname))
+            {
+                userHostParts.Add($"(ComputerName = \"{Hostname}\")");
+            }
+            if (!string.IsNullOrEmpty(Username))
+            {
+                userHostParts.Add($"(UserName = \"{Username}\")");
+            }
+
+            if (userHostParts.Any())
+            {
+                var userHostCondition = userHostParts.Count > 1 ? $"({string.Join(" AND ", userHostParts)})" : userHostParts[0];
+                if (parts.Any())
+                {
+                    return $"{userHostCondition} AND ({string.Join(" OR ", parts)})";
+                }
+                return userHostParts.Count > 1 ? userHostCondition : (string.IsNullOrEmpty(Hostname) ? $"UserName = \"{Username}\"" : $"ComputerName contains \"{Hostname}\"");
             }
 
             return parts.Any() ? string.Join(" OR ", parts) : "No IOCs entered";
@@ -499,58 +586,97 @@ namespace Pathfinder.ViewModels
         private string BuildDefenderQuery()
         {
             var parts = new System.Collections.Generic.List<string>();
+            var hostFilter = !string.IsNullOrEmpty(Hostname) ? $"DeviceName == \"{Hostname}\"" : "";
+            var userFilter = !string.IsNullOrEmpty(Username) ? $"AccountName == \"{Username}\"" : "";
+            var combinedFilter = "";
+            if (!string.IsNullOrEmpty(hostFilter) && !string.IsNullOrEmpty(userFilter))
+            {
+                combinedFilter = $"\n| where {hostFilter} and {userFilter}";
+            }
+            else if (!string.IsNullOrEmpty(hostFilter))
+            {
+                combinedFilter = $"\n| where {hostFilter}";
+            }
+            else if (!string.IsNullOrEmpty(userFilter))
+            {
+                combinedFilter = $"\n| where {userFilter}";
+            }
+
+            if (FilePaths.Any())
+            {
+                bool hasMultipleSlashes = FilePaths.Any(p => p.Contains("\\\\"));
+                if (hasMultipleSlashes)
+                {
+                    DefenderReminder = "Multiple consecutive slashes detected - Pathfinder expects single slashes and adjusts output accordingly.";
+                }
+                else
+                {
+                    DefenderReminder = "";
+                }
+
+                var pathConditions = string.Join(" or ", FilePaths.Select(p => 
+                    $"FolderPath contains tolower(\"{p.Replace(@"\", @"\\")}\")"));
+                parts.Add($"(DeviceFileEvents\n| where ({pathConditions}){combinedFilter})");
+            }
 
             if (Domains.Any())
             {
                 var domainConditions = string.Join(" or ", Domains.Select(d => $"RemoteUrl like \"{d}\""));
-                parts.Add($"(DeviceNetworkEvents\n| where {domainConditions})");
+                parts.Add($"(DeviceNetworkEvents\n| where {domainConditions}{combinedFilter})");
             }
 
             if (IPs.Any())
             {
-                parts.Add($"(DeviceNetworkEvents\n| where RemoteIP in (\"{string.Join("\", \"", IPs)}\"))");
+                parts.Add($"(DeviceNetworkEvents\n| where RemoteIP in (\"{string.Join("\", \"", IPs)}\"){combinedFilter})");
             }
 
             if (MD5Hashes.Any())
             {
-                parts.Add($"(DeviceFileEvents\n| where MD5 in (\"{string.Join("\", \"", MD5Hashes.Select(h => h.ToLower()))}\"))");
+                parts.Add($"(DeviceFileEvents\n| where MD5 in (\"{string.Join("\", \"", MD5Hashes.Select(h => h.ToLower()))}\"){combinedFilter})");
             }
 
             if (SHA1Hashes.Any())
             {
-                parts.Add($"(DeviceFileEvents\n| where SHA1 in (\"{string.Join("\", \"", SHA1Hashes.Select(h => h.ToLower()))}\"))");
+                parts.Add($"(DeviceFileEvents\n| where SHA1 in (\"{string.Join("\", \"", SHA1Hashes.Select(h => h.ToLower()))}\"){combinedFilter})");
             }
 
             if (SHA256Hashes.Any())
             {
-                parts.Add($"(DeviceFileEvents\n| where SHA256 in (\"{string.Join("\", \"", SHA256Hashes.Select(h => h.ToLower()))}\"))");
+                parts.Add($"(DeviceFileEvents\n| where SHA256 in (\"{string.Join("\", \"", SHA256Hashes.Select(h => h.ToLower()))}\"){combinedFilter})");
             }
 
             if (FileNames.Any())
             {
-                parts.Add($"(DeviceFileEvents\n| where FileName in (\"{string.Join("\", \"", FileNames)}\"))");
+                parts.Add($"(DeviceFileEvents\n| where FileName in (\"{string.Join("\", \"", FileNames)}\"){combinedFilter})");
             }
 
             if (Commands.Any())
             {
                 var cmdConditions = string.Join(" or ", Commands.Select(c => $"(ProcessCommandLine like \"{c}\" or InitiatingProcessCommandLine like \"{c}\")"));
-                parts.Add($"(DeviceProcessEvents\n| where {cmdConditions})");
+                parts.Add($"(DeviceProcessEvents\n| where {cmdConditions}{combinedFilter})");
             }
 
             if (ProcessNames.Any())
             {
                 var processConditions = string.Join(" or ", ProcessNames.Select(p => $"FileName like \"{p}\""));
-                parts.Add($"(DeviceProcessEvents\n| where ({processConditions}))");
+                parts.Add($"(DeviceProcessEvents\n| where ({processConditions}){combinedFilter})");
             }
 
-            if (FilePaths.Any())
+            if (LoadedDLLs.Any())
             {
-                var pathConditions = string.Join(" or ", FilePaths.Select(p => $"FolderPath contains tolower(\"{p}\")"));
-                parts.Add($"(DeviceFileEvents\n| where ({pathConditions}))");
+                var dllConditions = string.Join(" or ", LoadedDLLs.Select(dll => $"FileName like \"{dll}\""));
+                parts.Add($"(DeviceImageLoadEvents\n| where {dllConditions}{combinedFilter})");
             }
 
             if (parts.Count == 0)
             {
+                if (!string.IsNullOrEmpty(Hostname) || !string.IsNullOrEmpty(Username))
+                {
+                    var filters = new System.Collections.Generic.List<string>();
+                    if (!string.IsNullOrEmpty(Hostname)) filters.Add($"DeviceName == \"{Hostname}\"");
+                    if (!string.IsNullOrEmpty(Username)) filters.Add($"AccountName == \"{Username}\"");
+                    return $"DeviceEvents\n| where {string.Join(" and ", filters)}";
+                }
                 return "No IOCs entered";
             }
             else if (parts.Count == 1)
@@ -619,6 +745,32 @@ namespace Pathfinder.ViewModels
                 parts.Add($"({pathConditions})");
             }
 
+            if (LoadedDLLs.Any())
+            {
+                var dllConditions = string.Join(" OR ", LoadedDLLs.Select(dll => $"modload:\"{dll}\""));
+                parts.Add($"({dllConditions})");
+            }
+
+            var userHostParts = new System.Collections.Generic.List<string>();
+            if (!string.IsNullOrEmpty(Hostname))
+            {
+                userHostParts.Add($"(hostname:{Hostname})");
+            }
+            if (!string.IsNullOrEmpty(Username))
+            {
+                userHostParts.Add($"(username:{Username})");
+            }
+
+            if (userHostParts.Any())
+            {
+                var userHostCondition = userHostParts.Count > 1 ? $"({string.Join(" AND ", userHostParts)})" : userHostParts[0];
+                if (parts.Any())
+                {
+                    return $"{userHostCondition} AND ({string.Join(" OR ", parts)})";
+                }
+                return userHostParts.Count > 1 ? userHostCondition : (string.IsNullOrEmpty(Hostname) ? $"username:{Username}" : $"hostname:{Hostname}");
+            }
+
             return parts.Any() ? string.Join(" OR ", parts) : "No IOCs entered";
         }
 
@@ -678,6 +830,32 @@ namespace Pathfinder.ViewModels
             {
                 var pathConditions = string.Join(" OR ", FilePaths.Select(p => $"(filemod_name:\"{p.Replace("\\", "/")}\" OR modload_name:\"{p.Replace("\\", "/")}\")"));
                 parts.Add($"({pathConditions})");
+            }
+
+            if (LoadedDLLs.Any())
+            {
+                var dllConditions = string.Join(" OR ", LoadedDLLs.Select(dll => $"modload_name:\"{dll}\""));
+                parts.Add($"({dllConditions})");
+            }
+
+            var userHostParts = new System.Collections.Generic.List<string>();
+            if (!string.IsNullOrEmpty(Hostname))
+            {
+                userHostParts.Add($"(device_name:{Hostname})");
+            }
+            if (!string.IsNullOrEmpty(Username))
+            {
+                userHostParts.Add($"(process_username:{Username})");
+            }
+
+            if (userHostParts.Any())
+            {
+                var userHostCondition = userHostParts.Count > 1 ? $"({string.Join(" AND ", userHostParts)})" : userHostParts[0];
+                if (parts.Any())
+                {
+                    return $"{userHostCondition} AND ({string.Join(" OR ", parts)})";
+                }
+                return userHostParts.Count > 1 ? userHostCondition : (string.IsNullOrEmpty(Hostname) ? $"process_username:{Username}" : $"device_name:{Hostname}");
             }
 
             return parts.Any() ? string.Join(" OR ", parts) : "No IOCs entered";
