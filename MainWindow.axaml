@@ -46,41 +46,44 @@
         </Style>
         <Style Selector="ToggleButton.CollapseButton">
             <Setter Property="Background" Value="{Binding CurrentTheme.ButtonBackground}"/>
-            <Setter Property="BorderBrush" Value="LightGray"/>
-            <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Foreground" Value="{Binding CurrentTheme.ButtonForeground}"/>
-            <Setter Property="Padding" Value="6,4"/>
-            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Width" Value="24"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="FontSize" Value="14"/>
             <Setter Property="FontFamily" Value="{Binding CurrentTheme.UIFontFamily}"/>
-            <Setter Property="CornerRadius" Value="6"/>
-            <Setter Property="Opacity" Value="1"/>
-            <Setter Property="Width" Value="20"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+                    <BrushTransition Property="Background" Duration="0:0:0.2"/>
+                </Transitions>
+            </Setter>
             <Setter Property="Template">
                 <ControlTemplate>
                     <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="{TemplateBinding CornerRadius}">
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            BorderThickness="0">
                         <ContentPresenter Content="{TemplateBinding Content}"
                                           HorizontalAlignment="Center"
-                                          VerticalAlignment="Center"
-                                          TextBlock.Foreground="{TemplateBinding Foreground}"/>
+                                          VerticalAlignment="Center"/>
                     </Border>
                 </ControlTemplate>
             </Setter>
         </Style>
         <Style Selector="ToggleButton.CollapseButton:not(:checked)">
-            <Setter Property="Content" Value="[+]"/>
+            <Setter Property="Content" Value="➕"/>
         </Style>
         <Style Selector="ToggleButton.CollapseButton:checked">
-            <Setter Property="Content" Value="[-]"/>
+            <Setter Property="Content" Value="➖"/>
         </Style>
         <Style Selector="ToggleButton.CollapseButton:pointerover">
-            <Setter Property="Background" Value="#444444"/>
+            <Setter Property="Background" Value="#555555"/>
+            <Setter Property="Opacity" Value="0.9"/>
         </Style>
         <Style Selector="ToggleButton.CollapseButton:pressed">
-            <Setter Property="Opacity" Value="0.8"/>
-            <Setter Property="Background" Value="#222222"/>
+            <Setter Property="Background" Value="#333333"/>
+            <Setter Property="Opacity" Value="0.7"/>
         </Style>
         <Style Selector="MenuItem">
             <Setter Property="Foreground" Value="{Binding CurrentTheme.TextForeground}"/>
@@ -369,6 +372,60 @@
                                     Height="150" 
                                     FontFamily="Ubuntu Mono, Consolas, monospace" 
                                     IsVisible="{Binding #LoadedDLLsCollapseButton.IsChecked}"/>
+                        </StackPanel>
+                        <!-- Scheduled Tasks Section -->
+                        <StackPanel Margin="0,0,0,5">
+                            <DockPanel LastChildFill="False" Margin="0,0,0,2">
+                                <TextBlock Text="Scheduled Tasks" Classes="Label" DockPanel.Dock="Left"/>
+                                <ToggleButton Name="ScheduledTasksCollapseButton" Classes="CollapseButton" IsChecked="{Binding IsScheduledTasksCollapsed, Mode=TwoWay}" Margin="0,0,10,0" DockPanel.Dock="Right"/>
+                                <Border Background="#30000000" CornerRadius="8" Margin="0,0,5,0" Padding="2" DockPanel.Dock="Right">
+                                    <Button Content="Clear" Command="{Binding ClearScheduledTasksCommand}" Classes="ClearButton"/>
+                                </Border>
+                            </DockPanel>
+                            <TextBox Name="ScheduledTasksTextBox" 
+                                    Watermark="proxy&#x0a;schedule&#x0a;netcheck" 
+                                    AcceptsReturn="True" 
+                                    Text="{Binding ScheduledTasks, Converter={StaticResource StringToListConverter}}" 
+                                    Margin="0,0,0,10" 
+                                    Height="150" 
+                                    FontFamily="Ubuntu Mono, Consolas, monospace" 
+                                    IsVisible="{Binding #ScheduledTasksCollapseButton.IsChecked}"/>
+                        </StackPanel>
+                        <!-- Services Section -->
+                        <StackPanel Margin="0,0,0,5">
+                            <DockPanel LastChildFill="False" Margin="0,0,0,2">
+                                <TextBlock Text="Services" Classes="Label" DockPanel.Dock="Left"/>
+                                <ToggleButton Name="ServicesCollapseButton" Classes="CollapseButton" IsChecked="{Binding IsServicesCollapsed, Mode=TwoWay}" Margin="0,0,10,0" DockPanel.Dock="Right"/>
+                                <Border Background="#30000000" CornerRadius="8" Margin="0,0,5,0" Padding="2" DockPanel.Dock="Right">
+                                    <Button Content="Clear" Command="{Binding ClearServicesCommand}" Classes="ClearButton"/>
+                                </Border>
+                            </DockPanel>
+                            <TextBox Name="ServicesTextBox" 
+                                    Watermark="PlugPlay&#x0a;Dnscache&#x0a;Themes" 
+                                    AcceptsReturn="True" 
+                                    Text="{Binding Services, Converter={StaticResource StringToListConverter}}" 
+                                    Margin="0,0,0,10" 
+                                    Height="150" 
+                                    FontFamily="Ubuntu Mono, Consolas, monospace" 
+                                    IsVisible="{Binding #ServicesCollapseButton.IsChecked}"/>
+                        </StackPanel>
+                        <!-- Registry Modifications Section -->
+                        <StackPanel Margin="0,0,0,5">
+                            <DockPanel LastChildFill="False" Margin="0,0,0,2">
+                                <TextBlock Text="Registry Modifications" Classes="Label" DockPanel.Dock="Left"/>
+                                <ToggleButton Name="RegistryModificationsCollapseButton" Classes="CollapseButton" IsChecked="{Binding IsRegistryModificationsCollapsed, Mode=TwoWay}" Margin="0,0,10,0" DockPanel.Dock="Right"/>
+                                <Border Background="#30000000" CornerRadius="8" Margin="0,0,5,0" Padding="2" DockPanel.Dock="Right">
+                                    <Button Content="Clear" Command="{Binding ClearRegistryModificationsCommand}" Classes="ClearButton"/>
+                                </Border>
+                            </DockPanel>
+                            <TextBox Name="RegistryModificationsTextBox" 
+                                    Watermark="CurrentVersion\Run&#x0a;CurrentControlSet\Services&#x0a;shell\open\command" 
+                                    AcceptsReturn="True" 
+                                    Text="{Binding RegistryModifications, Converter={StaticResource StringToListConverter}}" 
+                                    Margin="0,0,0,10" 
+                                    Height="150" 
+                                    FontFamily="Ubuntu Mono, Consolas, monospace" 
+                                    IsVisible="{Binding #RegistryModificationsCollapseButton.IsChecked}"/>
                         </StackPanel>
                     </StackPanel>
                 </ScrollViewer>

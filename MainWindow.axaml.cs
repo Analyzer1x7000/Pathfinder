@@ -68,28 +68,76 @@ namespace Pathfinder
 
             textBlock.Inlines!.Clear();
 
-            // Split on top-level AND/OR while preserving nested parentheses
-            var parts = SplitQuery(query);
-            bool highlight = true;
+            // Special case for "No IOCs entered"
+            if (query == "No IOCs entered")
+            {
+                textBlock.Inlines.Add(new Run(query)
+                {
+                    Background = GetHighlightBrush(viewModel.CurrentTheme!),
+                    Foreground = viewModel.CurrentTheme!.TextForeground
+                });
+                return;
+            }
 
-            foreach (var part in parts)
+            // Determine if query has userHostParts and IOC parts
+            string userHostPart = "";
+            string iocPart = "";
+            bool hasUserHost = query.Contains(" AND (") && !query.StartsWith("("); // Indicates userHostParts before IOCs
+
+            if (hasUserHost && textBlock.Name != "DefenderOutput") // Defender uses different structure
+            {
+                int andIndex = query.IndexOf(" AND (");
+                userHostPart = query.Substring(0, andIndex).Trim();
+                iocPart = query.Substring(andIndex + 5).Trim(); // Skip " AND "
+                if (iocPart.StartsWith("(") && iocPart.EndsWith(")")) iocPart = iocPart.Substring(1, iocPart.Length - 2); // Remove outer parentheses
+            }
+            else
+            {
+                iocPart = query; // No userHostParts, treat as IOCs only
+            }
+
+            // Split IOC parts based on EDR type
+            var iocParts = textBlock.Name == "DefenderOutput" ? SplitDefenderQuery(iocPart) : SplitQuery(iocPart);
+
+            // Add userHostPart if present (non-Defender EDRs)
+            if (!string.IsNullOrEmpty(userHostPart) && textBlock.Name != "DefenderOutput")
+            {
+                textBlock.Inlines.Add(new Run(userHostPart.Trim())
+                {
+                    Background = GetHighlightBrush(viewModel.CurrentTheme!),
+                    Foreground = viewModel.CurrentTheme!.TextForeground
+                });
+                textBlock.Inlines.Add(new Run(" AND ") { Foreground = viewModel.CurrentTheme!.TextForeground });
+            }
+
+            // Add IOC parts with alternating highlighting
+            for (int i = 0; i < iocParts.Count; i++)
             {
                 var highlightBrush = GetHighlightBrush(viewModel.CurrentTheme!);
-                var run = new Run(part.Trim())
+                bool shouldHighlight = string.IsNullOrEmpty(userHostPart) ? (i % 2 == 0) : (i % 2 == 1);
+
+                var run = new Run(iocParts[i].Trim())
                 {
-                    Background = highlight ? highlightBrush : viewModel.CurrentTheme!.TextBoxBackground,
+                    Background = shouldHighlight ? highlightBrush : viewModel.CurrentTheme!.TextBoxBackground,
                     Foreground = viewModel.CurrentTheme!.TextForeground
                 };
                 textBlock.Inlines.Add(run);
-                if (part != parts.Last())
+
+                if (i < iocParts.Count - 1)
                 {
-                    var separator = query.Contains(" AND ") && query.IndexOf(" AND ") < query.IndexOf(" OR ", StringComparison.OrdinalIgnoreCase) ? " AND " : " OR ";
+                    string separator = textBlock.Name == "DefenderOutput" && iocParts.Count > 1 ? ",\n" : " OR ";
                     textBlock.Inlines.Add(new Run(separator) { Foreground = viewModel.CurrentTheme!.TextForeground });
                 }
-                highlight = !highlight;
+            }
+
+            // For Defender with multiple parts, prepend "union\n" if needed
+            if (textBlock.Name == "DefenderOutput" && iocParts.Count > 1)
+            {
+                textBlock.Inlines.Insert(0, new Run("union\n") { Foreground = viewModel.CurrentTheme!.TextForeground });
             }
         }
 
+        // No change needed to SplitQuery
         private System.Collections.Generic.List<string> SplitQuery(string query)
         {
             var parts = new System.Collections.Generic.List<string>();
@@ -101,11 +149,11 @@ namespace Pathfinder
                 if (query[i] == '(') parenCount++;
                 else if (query[i] == ')') parenCount--;
 
-                if (parenCount == 0 && (query.Substring(i).StartsWith(" AND ") || query.Substring(i).StartsWith(" OR ")))
+                if (parenCount == 0 && query.Substring(i).StartsWith(" OR "))
                 {
                     parts.Add(query.Substring(start, i - start));
-                    start = i + (query[i] == 'A' ? 5 : 4); // Skip " AND " or " OR "
-                    i = start - 1; // Reset to continue from new start
+                    start = i + 4; // Skip " OR "
+                    i = start - 1;
                 }
             }
 
@@ -115,6 +163,16 @@ namespace Pathfinder
             }
 
             return parts;
+        }
+
+        // No change needed to SplitDefenderQuery
+        private System.Collections.Generic.List<string> SplitDefenderQuery(string query)
+        {
+            if (!query.Contains("union\n")) return new System.Collections.Generic.List<string> { query };
+            return query.Split(new[] { "union\n" }, StringSplitOptions.None)
+                        .SelectMany(part => part.Split(new[] { ",\n" }, StringSplitOptions.None))
+                        .Where(part => !string.IsNullOrWhiteSpace(part))
+                        .ToList();
         }
 
         private ISolidColorBrush GetHighlightBrush(Theme theme)

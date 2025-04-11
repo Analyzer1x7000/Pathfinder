@@ -97,6 +97,9 @@ namespace Pathfinder.ViewModels
         private ObservableCollection<string> _processNames = new();
         private ObservableCollection<string> _filePaths = new();
         private ObservableCollection<string> _loadedDLLs = new();
+        private ObservableCollection<string> _scheduledTasks = new();
+        private ObservableCollection<string> _services = new();
+        private ObservableCollection<string> _registryModifications = new();
         private string _hostname = "";
 
         private Theme? _currentTheme;
@@ -111,6 +114,9 @@ namespace Pathfinder.ViewModels
         private bool _isProcessNamesCollapsed = true;
         private bool _isFilePathsCollapsed = true;
         private bool _isLoadedDLLsCollapsed = true;
+        private bool _isScheduledTasksCollapsed = true;
+        private bool _isServicesCollapsed = true;
+        private bool _isRegistryModificationsCollapsed = true;
 
         public ObservableCollection<string> Domains
         {
@@ -131,6 +137,10 @@ namespace Pathfinder.ViewModels
         public ObservableCollection<string> ProcessNames { get => _processNames; set => this.RaiseAndSetIfChanged(ref _processNames, value); }
         public ObservableCollection<string> FilePaths { get => _filePaths; set => this.RaiseAndSetIfChanged(ref _filePaths, value); }
         public ObservableCollection<string> LoadedDLLs { get => _loadedDLLs; set => this.RaiseAndSetIfChanged(ref _loadedDLLs, value); }
+        public ObservableCollection<string> ScheduledTasks { get => _scheduledTasks; set => this.RaiseAndSetIfChanged(ref _scheduledTasks, value); }
+        public ObservableCollection<string> Services { get => _services; set => this.RaiseAndSetIfChanged(ref _services, value); }
+        public ObservableCollection<string> RegistryModifications { get => _registryModifications; set => this.RaiseAndSetIfChanged(ref _registryModifications, value); }
+        
         public string Username
         {
             get => _username;
@@ -141,6 +151,12 @@ namespace Pathfinder.ViewModels
         {
             get => _hostname;
             set => this.RaiseAndSetIfChanged(ref _hostname, value);
+        }
+        private string _registryModificationsReminder = "";
+        public string RegistryModificationsReminder
+        {
+            get => _registryModificationsReminder;
+            set => this.RaiseAndSetIfChanged(ref _registryModificationsReminder, value);
         }
 
         public string SentinelOneQuery { get => _sentinelOneQuery; set => this.RaiseAndSetIfChanged(ref _sentinelOneQuery, value); }
@@ -238,6 +254,24 @@ namespace Pathfinder.ViewModels
             get => _isLoadedDLLsCollapsed;
             set => this.RaiseAndSetIfChanged(ref _isLoadedDLLsCollapsed, value);
         }
+        
+        public bool IsScheduledTasksCollapsed
+        {
+            get => _isScheduledTasksCollapsed;
+            set => this.RaiseAndSetIfChanged(ref _isScheduledTasksCollapsed, value);
+        }
+
+        public bool IsServicesCollapsed
+        {
+            get => _isServicesCollapsed;
+            set => this.RaiseAndSetIfChanged(ref _isServicesCollapsed, value);
+        }
+
+        public bool IsRegistryModificationsCollapsed
+        {
+            get => _isRegistryModificationsCollapsed;
+            set => this.RaiseAndSetIfChanged(ref _isRegistryModificationsCollapsed, value);
+        }
 
         public Theme? CurrentTheme
         {
@@ -261,6 +295,9 @@ namespace Pathfinder.ViewModels
         public ICommand ClearProcessNamesCommand { get; }
         public ICommand ClearFilePathsCommand { get; }
         public ICommand ClearLoadedDLLsCommand { get; }
+        public ICommand ClearScheduledTasksCommand { get; }
+        public ICommand ClearServicesCommand { get; }
+        public ICommand ClearRegistryModificationsCommand { get; }
         public ICommand ClearHostnameCommand { get; }
         public ICommand ClearUsernameCommand { get; }
         public ICommand ClearAllCommand { get; }
@@ -279,24 +316,31 @@ namespace Pathfinder.ViewModels
             CurrentTheme = new Theme("Night Shift", "#1A1A1A", "#333333", "#222222", "White", "#333333", "#D3D3D3", "JetBrains Mono, Consolas, Ubuntu Mono");
 
             this.WhenAnyValue(
-                x => x.Domains,
-                x => x.FileNames,
-                x => x.Commands,
-                x => x.ProcessNames,
-                x => x.FilePaths,
-                x => x.Hostname,
-                x => x.Username)
-                .Throttle(TimeSpan.FromMilliseconds(100))
-                .Subscribe(_ => UpdateQueries());
+                    x => x.Domains,
+                    x => x.FilePaths,
+                    x => x.Hostname,
+                    x => x.Username,
+                    x => x.ScheduledTasks,
+                    x => x.Services,
+                    x => x.RegistryModifications)
+                    .Throttle(TimeSpan.FromMilliseconds(100))
+                    .Subscribe(_ => UpdateQueries());
 
-            this.WhenAnyValue(
-                x => x.IPs,
-                x => x.MD5Hashes,
-                x => x.SHA1Hashes,
-                x => x.SHA256Hashes,
-                x => x.LoadedDLLs)
-                .Throttle(TimeSpan.FromMilliseconds(100))
-                .Subscribe(_ => UpdateQueries());
+                this.WhenAnyValue(
+                    x => x.IPs,
+                    x => x.MD5Hashes,
+                    x => x.SHA1Hashes,
+                    x => x.SHA256Hashes,
+                    x => x.LoadedDLLs)
+                    .Throttle(TimeSpan.FromMilliseconds(100))
+                    .Subscribe(_ => UpdateQueries());
+
+                this.WhenAnyValue(
+                    x => x.Commands,
+                    x => x.ProcessNames,
+                    x => x.FileNames)
+                    .Throttle(TimeSpan.FromMilliseconds(100))
+                    .Subscribe(_ => UpdateQueries());
 
             CopySentinelOneCommand = new RelayCommand(CopySentinelOneQuery);
             CopyCrowdStrikeCommand = new RelayCommand(CopyCrowdStrikeQuery);
@@ -314,6 +358,9 @@ namespace Pathfinder.ViewModels
             ClearProcessNamesCommand = new RelayCommand(() => { ProcessNames.Clear(); this.RaisePropertyChanged(nameof(ProcessNames)); });
             ClearFilePathsCommand = new RelayCommand(() => { FilePaths.Clear(); this.RaisePropertyChanged(nameof(FilePaths)); });
             ClearLoadedDLLsCommand = new RelayCommand(() => { LoadedDLLs.Clear(); this.RaisePropertyChanged(nameof(LoadedDLLs)); });
+            ClearScheduledTasksCommand = new RelayCommand(() => { ScheduledTasks.Clear(); this.RaisePropertyChanged(nameof(ScheduledTasks)); });
+            ClearServicesCommand = new RelayCommand(() => { Services.Clear(); this.RaisePropertyChanged(nameof(Services)); });
+            ClearRegistryModificationsCommand = new RelayCommand(() => { RegistryModifications.Clear(); this.RaisePropertyChanged(nameof(RegistryModifications)); });
             ClearHostnameCommand = new RelayCommand(() => { Hostname = ""; this.RaisePropertyChanged(nameof(Hostname)); });
             ClearUsernameCommand = new RelayCommand(() => { Username = ""; this.RaisePropertyChanged(nameof(Username)); });
             ClearAllCommand = new RelayCommand(ClearAll);
@@ -347,6 +394,9 @@ namespace Pathfinder.ViewModels
             ProcessNames.Clear();
             FilePaths.Clear();
             LoadedDLLs.Clear();
+            ScheduledTasks.Clear();
+            Services.Clear();
+            RegistryModifications.Clear();
             Hostname = "";
             Username = "";
             this.RaisePropertyChanged(nameof(Domains));
@@ -359,6 +409,9 @@ namespace Pathfinder.ViewModels
             this.RaisePropertyChanged(nameof(ProcessNames));
             this.RaisePropertyChanged(nameof(FilePaths));
             this.RaisePropertyChanged(nameof(LoadedDLLs));
+            this.RaisePropertyChanged(nameof(ScheduledTasks));
+            this.RaisePropertyChanged(nameof(Services));
+            this.RaisePropertyChanged(nameof(RegistryModifications));
             this.RaisePropertyChanged(nameof(Hostname));
             this.RaisePropertyChanged(nameof(Username));
         }
@@ -375,6 +428,9 @@ namespace Pathfinder.ViewModels
             IsProcessNamesCollapsed = false;
             IsFilePathsCollapsed = false;
             IsLoadedDLLsCollapsed = false;
+            IsScheduledTasksCollapsed = false;
+            IsServicesCollapsed = false;
+            IsRegistryModificationsCollapsed = false;
         }
 
         private string BuildSentinelOneQuery()
@@ -468,6 +524,33 @@ namespace Pathfinder.ViewModels
                 parts.Add($"(event.type='Module Load' and ({dllConditions}))");
             }
 
+            if (ScheduledTasks.Any())
+            {
+                var taskConditions = string.Join(" or ", ScheduledTasks.Select(t => $"(task.path matches '{t}' or task.name matches '{t}')"));
+                parts.Add($"(event.category='scheduled_task' and ({taskConditions}))");
+            }
+
+            if (Services.Any())
+            {
+                var serviceConditions = string.Join(" or ", Services.Select(s => $"src.process.cmdline matches \"{s}\""));
+                parts.Add($"((event.type = 'Process Creation') and (src.process.displayName contains 'services.exe' or src.process.cmdline contains 'sc create' or src.process.cmdline contains 'sc start') and ({serviceConditions}))");
+            }
+
+            if (RegistryModifications.Any())
+            {
+                bool hasMultipleSlashes = RegistryModifications.Any(r => r.Contains("\\\\"));
+                RegistryModificationsReminder = hasMultipleSlashes
+                    ? "Multiple consecutive slashes detected - Pathfinder expects single slashes and adjusts output accordingly."
+                    : "";
+                
+                var registryConditions = string.Join(" or ", RegistryModifications.Select(r => 
+                    $"registry.keyPath matches \"{r.Replace(@"\", @"\\\\\\\")}\"")); // Quadruple slashes
+                parts.Add($"(event.category = 'registry' AND ({registryConditions}))");
+            } else
+            {
+                RegistryModificationsReminder = "";
+            }
+
             var userHostParts = new System.Collections.Generic.List<string>();
             if (!string.IsNullOrEmpty(Hostname))
             {
@@ -483,7 +566,7 @@ namespace Pathfinder.ViewModels
                 var userHostCondition = userHostParts.Count > 1 ? $"({string.Join(" AND ", userHostParts)})" : userHostParts[0];
                 if (parts.Any())
                 {
-                    return $"{userHostCondition} AND ({string.Join(" OR ", parts)})";
+                    return $"({userHostCondition}) AND (({string.Join(" OR ", parts)}))"; 
                 }
                 return userHostParts.Count > 1 ? userHostCondition : (string.IsNullOrEmpty(Hostname) ? userHostParts[0] : $"endpoint.name = \"{Hostname}\"");
             }
@@ -550,14 +633,39 @@ namespace Pathfinder.ViewModels
 
             if (ProcessNames.Any())
             {
-                var processConditions = string.Join(" OR ", ProcessNames.Select(p => $"(FileName like \"{p}\" OR ParentBaseFileName like \"{p}\" OR GrandparentBaseFileName like \"{p}\")"));
-                parts.Add($"({processConditions})");
+                var processConditions = string.Join(" OR ", ProcessNames.Select(p => $"(FileName like \"{p}\" OR ParentBaseFileName like \"{p}\" OR GrandparentBaseFileName like \"{p}\" OR ImageFileName like \"{p}\")"));
+                parts.Add($"(#event_simpleName = \"ProcessRollup2\" AND ({processConditions}))");
             }
 
             if (LoadedDLLs.Any())
             {
                 var dllConditions = string.Join(" OR ", LoadedDLLs.Select(dll => $"FileName like \"{dll}\""));
-                parts.Add($"(#event_simpleName = \"ClassifiedModuleLoad\" AND ({dllConditions}))");
+                parts.Add($"(#event_simpleName = \"*oduleLoa*\" AND ({dllConditions}))");
+            }
+
+            if (ScheduledTasks.Any())
+            {
+                var taskConditions = string.Join(" OR ", ScheduledTasks.Select(t => $"(TaskName like \"{t}\" OR TaskExecCommand like \"{t}\")"));
+                parts.Add($"(#event_simpleName = \"*chedul*\" AND ({taskConditions}))");
+            }
+
+            if (ScheduledTasks.Any())
+            {
+                var taskConditions = string.Join(" OR ", ScheduledTasks.Select(t => $"(TaskName like \"{t}\" OR TaskExecCommand like \"{t}\")"));
+                parts.Add($"(#event_simpleName = \"*schedul*\" AND ({taskConditions}))");
+            }
+
+            if (Services.Any())
+            {
+                var serviceConditions = string.Join(" OR ", Services.Select(s => $"(ServiceImagePath like \"{s}\" OR CommandLine like \"{s}\")"));
+                parts.Add($"(#event_simpleName=\"*ervic*\" AND ({serviceConditions}))");
+            }
+
+            if (RegistryModifications.Any())
+            {
+                var registryConditions = string.Join(" OR ", RegistryModifications.Select(r => 
+                    $"RegObjectName like \"{r.Replace(@"\", @"\\")}\"")); // Double slashes
+                parts.Add($"(#event_simpleName like \"Reg\" AND ({registryConditions}))");
             }
 
             var userHostParts = new System.Collections.Generic.List<string>();
@@ -575,7 +683,7 @@ namespace Pathfinder.ViewModels
                 var userHostCondition = userHostParts.Count > 1 ? $"({string.Join(" AND ", userHostParts)})" : userHostParts[0];
                 if (parts.Any())
                 {
-                    return $"{userHostCondition} AND ({string.Join(" OR ", parts)})";
+                    return $"({userHostCondition}) AND (({string.Join(" OR ", parts)}))"; // Add extra parentheses around IOC parts
                 }
                 return userHostParts.Count > 1 ? userHostCondition : (string.IsNullOrEmpty(Hostname) ? $"UserName = \"{Username}\"" : $"ComputerName contains \"{Hostname}\"");
             }
@@ -668,6 +776,25 @@ namespace Pathfinder.ViewModels
                 parts.Add($"(DeviceImageLoadEvents\n| where {dllConditions}{combinedFilter})");
             }
 
+            if (ScheduledTasks.Any())
+            {
+                var taskConditions = string.Join(" or ", ScheduledTasks.Select(t => $"(ProcessCommandLine like \"{t}\")"));
+                parts.Add($"(DeviceProcessEvents\n| where FileName endswith \"schtasks.exe\" and (ProcessCommandLine has \"/create\" or ProcessCommandLine has \"/run\") and {taskConditions}{combinedFilter})");
+            }
+
+            if (Services.Any())
+            {
+                var serviceConditions = string.Join(" or ", Services.Select(s => $"(FileName like \"{s}\" or ProcessCommandLine like \"{s}\")"));
+                parts.Add($"(DeviceProcessEvents\n| where FileName has \"services.exe\" or ProcessCommandLine contains \"sc create\" or ProcessCommandLine contains \"sc start\"\n| where {serviceConditions}{combinedFilter})");
+            }
+
+            if (RegistryModifications.Any())
+            {
+                var registryConditions = string.Join(" or ", RegistryModifications.Select(r => 
+                    $"RegistryKey like \"{r.Replace(@"\", @"\\")}\"")); // Double slashes
+                parts.Add($"(DeviceRegistryEvents\n| where ActionType in (\"RegistryValueSet\", \"RegistryKeyCreate\", \"RegistryKeyDelete\", \"RegistryValueDelete\", \"RegistryValueRename\", \"RegistryKeyRename\")\n| where {registryConditions}{combinedFilter})");
+            }
+
             if (parts.Count == 0)
             {
                 if (!string.IsNullOrEmpty(Hostname) || !string.IsNullOrEmpty(Username))
@@ -749,6 +876,21 @@ namespace Pathfinder.ViewModels
             {
                 var dllConditions = string.Join(" OR ", LoadedDLLs.Select(dll => $"modload:\"{dll}\""));
                 parts.Add($"({dllConditions})");
+            }
+
+            if (ScheduledTasks.Any())
+            {
+                CBResponseReminder = "Pathfinder does not yet support Scheduled Tasks for this EDR. Scheduled Task output will be omitted.";
+            }
+
+            if (Services.Any())
+            {
+                CBResponseReminder = "Pathfinder does not yet support Services for this EDR. Services output will be omitted.";
+            }
+
+            if (RegistryModifications.Any())
+            {
+                CBResponseReminder = "Pathfinder does not yet support Registry Modifications for this EDR. Registry Modifications output will be omitted.";
             }
 
             var userHostParts = new System.Collections.Generic.List<string>();
@@ -836,6 +978,21 @@ namespace Pathfinder.ViewModels
             {
                 var dllConditions = string.Join(" OR ", LoadedDLLs.Select(dll => $"modload_name:\"{dll}\""));
                 parts.Add($"({dllConditions})");
+            }
+
+            if (ScheduledTasks.Any())
+            {
+                CBCloudReminder = "Pathfinder does not yet support Scheduled Tasks for this EDR. Scheduled Task output will be omitted.";
+            }
+
+             if (Services.Any())
+            {
+                CBCloudReminder = "Pathfinder does not yet support Services for this EDR. Services output will be omitted.";
+            }
+
+            if (RegistryModifications.Any())
+            {
+                CBCloudReminder = "Pathfinder does not yet support Registry Modifications for this EDR. Registry Modifications output will be omitted.";
             }
 
             var userHostParts = new System.Collections.Generic.List<string>();
