@@ -7,7 +7,7 @@ Pathfinder is a cross-platform tool designed for Digital Forensics and Incident 
 
 Built with .NET 8 and Avalonia UI, Pathfinder offers a sleek, user-friendly interface for building and copying EDR-specific queries.
 
-<p align="center"><img src="https://github.com/user-attachments/assets/601ec317-7f24-44f6-8764-317a6b56e503"></p>
+<p align="center"><img src="https://github.com/user-attachments/assets/8877ce22-6387-4f5f-9158-72271544970a"></p>
 
 ## Features
 - **Multi-EDR Support**: Generate queries for SentinelOne, CrowdStrike, Defender, CB Response, and CB Cloud.
@@ -33,3 +33,4 @@ Download the latest standalone executables from the [Releases page](https://gith
 2. For Linux, ensure it’s executable:
    ```bash
    chmod +x Pathfinder
+
