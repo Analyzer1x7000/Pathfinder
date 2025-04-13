@@ -544,7 +544,7 @@ namespace Pathfinder.ViewModels
                     : "";
                 
                 var registryConditions = string.Join(" or ", RegistryModifications.Select(r => 
-                    $"registry.keyPath matches \"{r.Replace(@"\", @"\\\\\\\")}\"")); // Quadruple slashes
+                    $"registry.keyPath matches \"{r.Replace(@"\", @"\\\\")}\"")); // Quadruple slashes
                 parts.Add($"(event.category = 'registry' AND ({registryConditions}))");
             } else
             {
