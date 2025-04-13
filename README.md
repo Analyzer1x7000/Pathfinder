@@ -21,8 +21,8 @@ Download the latest standalone executables from the [Releases page](https://gith
 
 | Platform       | Download Link                                                                                       | File Size (Approx.) |
 |----------------|----------------------------------------------------------------------------------------------------|---------------------|
-| Windows (x64)  | [Pathfinder.exe](https://github.com/Analyzer1x7000/Pathfinder/releases/download/v1.1-beta/Pathfinder_w64.exe) | ~90 MB             |
-| Linux (x64)    | [Pathfinder](https://github.com/Analyzer1x7000/Pathfinder/releases/download/v1.1-beta/Pathfinder_L64)         | ~85 MB             |
+| Windows (x64)  | [Pathfinder.exe](https://github.com/Analyzer1x7000/Pathfinder/releases/download/v1.4.1/Pathfinder.exe) | ~90 MB             |
+| Linux (x64)    | [Pathfinder](https://github.com/Analyzer1x7000/Pathfinder/releases/download/v1.4.1/Pathfinder)         | ~85 MB             |
 
 ### Notes
 - **Windows**: Run `Pathfinder.exe`—no .NET installation required.
