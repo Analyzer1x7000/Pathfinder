@@ -649,12 +649,6 @@ namespace Pathfinder.ViewModels
                 parts.Add($"(#event_simpleName = \"*chedul*\" AND ({taskConditions}))");
             }
 
-            if (ScheduledTasks.Any())
-            {
-                var taskConditions = string.Join(" OR ", ScheduledTasks.Select(t => $"(TaskName like \"{t}\" OR TaskExecCommand like \"{t}\")"));
-                parts.Add($"(#event_simpleName = \"*schedul*\" AND ({taskConditions}))");
-            }
-
             if (Services.Any())
             {
                 var serviceConditions = string.Join(" OR ", Services.Select(s => $"(ServiceImagePath like \"{s}\" OR CommandLine like \"{s}\")"));
