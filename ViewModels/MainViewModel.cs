@@ -904,7 +904,7 @@ namespace Pathfinder.ViewModels
 
             if (FilePaths.Any())
             {
-                var pathConditions = string.Join(" OR ", FilePaths.Select(p => $"(filemod:\"{p}\" OR modload:\"{p}\" OR path:\"{p}\")"));
+                var pathConditions = string.Join(" OR ", FilePaths.Select(p => $"(filemod:\"{p.Replace("\\", "/")}\" OR modload:\"{p.Replace("\\", "/")}\" OR path:\"{p.Replace("\\", "/")}\")"));
                 parts.Add($"({pathConditions})");
             }
 
