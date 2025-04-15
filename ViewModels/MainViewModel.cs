@@ -100,6 +100,7 @@ namespace Pathfinder.ViewModels
         private ObservableCollection<string> _scheduledTasks = new();
         private ObservableCollection<string> _services = new();
         private ObservableCollection<string> _registryModifications = new();
+        private ObservableCollection<string> _logins = new();
         private string _hostname = "";
 
         private Theme? _currentTheme;
@@ -117,6 +118,7 @@ namespace Pathfinder.ViewModels
         private bool _isScheduledTasksCollapsed = true;
         private bool _isServicesCollapsed = true;
         private bool _isRegistryModificationsCollapsed = true;
+        private bool _isLoginsCollapsed = true;
 
         public ObservableCollection<string> Domains
         {
@@ -140,7 +142,7 @@ namespace Pathfinder.ViewModels
         public ObservableCollection<string> ScheduledTasks { get => _scheduledTasks; set => this.RaiseAndSetIfChanged(ref _scheduledTasks, value); }
         public ObservableCollection<string> Services { get => _services; set => this.RaiseAndSetIfChanged(ref _services, value); }
         public ObservableCollection<string> RegistryModifications { get => _registryModifications; set => this.RaiseAndSetIfChanged(ref _registryModifications, value); }
-        
+        public ObservableCollection<string> Logins { get => _logins; set => this.RaiseAndSetIfChanged(ref _logins, value); }
         public string Username
         {
             get => _username;
@@ -273,6 +275,12 @@ namespace Pathfinder.ViewModels
             set => this.RaiseAndSetIfChanged(ref _isRegistryModificationsCollapsed, value);
         }
 
+        public bool IsLoginsCollapsed
+        {
+            get => _isLoginsCollapsed;
+            set => this.RaiseAndSetIfChanged(ref _isLoginsCollapsed, value);
+        }
+
         public Theme? CurrentTheme
         {
             get => _currentTheme;
@@ -298,6 +306,7 @@ namespace Pathfinder.ViewModels
         public ICommand ClearScheduledTasksCommand { get; }
         public ICommand ClearServicesCommand { get; }
         public ICommand ClearRegistryModificationsCommand { get; }
+        public ICommand ClearLoginsCommand { get; }
         public ICommand ClearHostnameCommand { get; }
         public ICommand ClearUsernameCommand { get; }
         public ICommand ClearAllCommand { get; }
@@ -338,9 +347,20 @@ namespace Pathfinder.ViewModels
                 this.WhenAnyValue(
                     x => x.Commands,
                     x => x.ProcessNames,
-                    x => x.FileNames)
+                    x => x.FileNames,
+                    x => x.Logins)
                     .Throttle(TimeSpan.FromMilliseconds(100))
                     .Subscribe(_ => UpdateQueries());
+
+                this.WhenAnyValue(x => x.Logins)
+                .Subscribe(logins =>
+                {
+                    if (logins.Any() && !string.IsNullOrEmpty(Username))
+                    {
+                        Username = "";
+                        this.RaisePropertyChanged(nameof(Username));
+                    }
+                });
 
             CopySentinelOneCommand = new RelayCommand(CopySentinelOneQuery);
             CopyCrowdStrikeCommand = new RelayCommand(CopyCrowdStrikeQuery);
@@ -361,6 +381,7 @@ namespace Pathfinder.ViewModels
             ClearScheduledTasksCommand = new RelayCommand(() => { ScheduledTasks.Clear(); this.RaisePropertyChanged(nameof(ScheduledTasks)); });
             ClearServicesCommand = new RelayCommand(() => { Services.Clear(); this.RaisePropertyChanged(nameof(Services)); });
             ClearRegistryModificationsCommand = new RelayCommand(() => { RegistryModifications.Clear(); this.RaisePropertyChanged(nameof(RegistryModifications)); });
+            ClearLoginsCommand = new RelayCommand(() => { Logins.Clear(); this.RaisePropertyChanged(nameof(Logins)); });
             ClearHostnameCommand = new RelayCommand(() => { Hostname = ""; this.RaisePropertyChanged(nameof(Hostname)); });
             ClearUsernameCommand = new RelayCommand(() => { Username = ""; this.RaisePropertyChanged(nameof(Username)); });
             ClearAllCommand = new RelayCommand(ClearAll);
@@ -397,6 +418,7 @@ namespace Pathfinder.ViewModels
             ScheduledTasks.Clear();
             Services.Clear();
             RegistryModifications.Clear();
+            Logins.Clear();
             Hostname = "";
             Username = "";
             this.RaisePropertyChanged(nameof(Domains));
@@ -412,6 +434,7 @@ namespace Pathfinder.ViewModels
             this.RaisePropertyChanged(nameof(ScheduledTasks));
             this.RaisePropertyChanged(nameof(Services));
             this.RaisePropertyChanged(nameof(RegistryModifications));
+            this.RaisePropertyChanged(nameof(Logins));
             this.RaisePropertyChanged(nameof(Hostname));
             this.RaisePropertyChanged(nameof(Username));
         }
@@ -431,6 +454,7 @@ namespace Pathfinder.ViewModels
             IsScheduledTasksCollapsed = false;
             IsServicesCollapsed = false;
             IsRegistryModificationsCollapsed = false;
+            IsLoginsCollapsed = false;
         }
 
         private string BuildSentinelOneQuery()
@@ -551,6 +575,12 @@ namespace Pathfinder.ViewModels
                 RegistryModificationsReminder = "";
             }
 
+            if (Logins.Any())
+            {
+                var loginConditions = string.Join(" OR ", Logins.Select(l => $"event.login.userName = \"{l}\""));
+                parts.Add($"(((event.type = 'Login') AND (event.login.type != \"UNLOCK\" AND event.login.type != \"INTERACTIVE\" AND event.login.type != \"CACHED_INTERACTIVE\") AND src.endpoint.ip.address != \"127.0.0.1\") AND ({loginConditions}))");
+            }
+
             var userHostParts = new System.Collections.Generic.List<string>();
             if (!string.IsNullOrEmpty(Hostname))
             {
@@ -660,6 +690,12 @@ namespace Pathfinder.ViewModels
                 var registryConditions = string.Join(" OR ", RegistryModifications.Select(r => 
                     $"RegObjectName like \"{r.Replace(@"\", @"\\")}\"")); // Double slashes
                 parts.Add($"(#event_simpleName like \"Reg\" AND ({registryConditions}))");
+            }
+
+            if (Logins.Any())
+            {
+                var loginConditions = string.Join(" OR ", Logins.Select(l => $"event.login.userName == \"{l}\""));
+                parts.Add($"(((event.type = 'Login') AND (event.login.type != \"UNLOCK\" AND event.login.type != \"INTERACTIVE\" AND event.login.type != \"CACHED_INTERACTIVE\") AND src.endpoint.ip.address != \"127.0.0.1\") AND ({loginConditions}))");
             }
 
             var userHostParts = new System.Collections.Generic.List<string>();
@@ -789,6 +825,12 @@ namespace Pathfinder.ViewModels
                 parts.Add($"(DeviceRegistryEvents\n| where ActionType in (\"RegistryValueSet\", \"RegistryKeyCreate\", \"RegistryKeyDelete\", \"RegistryValueDelete\", \"RegistryValueRename\", \"RegistryKeyRename\")\n| where {registryConditions}{combinedFilter})");
             }
 
+            if (Logins.Any())
+            {
+                var loginConditions = string.Join(" OR ", Logins.Select(l => $"AccountName has \"{l}\""));
+                parts.Add($"(DeviceLogonEvents\n| where LogonType != \"Unknown\" AND LogonType != \"Interactive\"\n| where {loginConditions}{combinedFilter})");
+            }
+
             if (parts.Count == 0)
             {
                 if (!string.IsNullOrEmpty(Hostname) || !string.IsNullOrEmpty(Username))
@@ -885,6 +927,11 @@ namespace Pathfinder.ViewModels
             if (RegistryModifications.Any())
             {
                 CBResponseReminder = "Pathfinder does not yet support Registry Modifications for this EDR. Registry Modifications output will be omitted.";
+            }
+
+            if (Logins.Any())
+            {
+                CBResponseReminder = "Logins are not yet supported for this EDR.";
             }
 
             var userHostParts = new System.Collections.Generic.List<string>();
@@ -987,6 +1034,11 @@ namespace Pathfinder.ViewModels
             if (RegistryModifications.Any())
             {
                 CBCloudReminder = "Pathfinder does not yet support Registry Modifications for this EDR. Registry Modifications output will be omitted.";
+            }
+
+            if (Logins.Any())
+            {
+                CBCloudReminder = "Logins are not yet supported for this EDR.";
             }
 
             var userHostParts = new System.Collections.Generic.List<string>();

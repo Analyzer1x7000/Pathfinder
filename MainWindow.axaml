@@ -12,6 +12,7 @@
         <converters:StringToListConverter x:Key="StringToListConverter"/>
         <converters:LineNumberConverter x:Key="LineNumberConverter"/>
         <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
+        <converters:CollectionToEnabledConverter x:Key="CollectionToEnabledConverter"/>
     </Window.Resources>
     <Window.Styles>
         <Style Selector="Button.ClearButton">
@@ -427,6 +428,24 @@
                                     FontFamily="Ubuntu Mono, Consolas, monospace" 
                                     IsVisible="{Binding #RegistryModificationsCollapseButton.IsChecked}"/>
                         </StackPanel>
+                        <!-- Logins Section -->
+                        <StackPanel Margin="0,0,0,5">
+                            <DockPanel LastChildFill="False" Margin="0,0,0,2">
+                                <TextBlock Text="Logins" Classes="Label" DockPanel.Dock="Left"/>
+                                <ToggleButton Name="LoginsCollapseButton" Classes="CollapseButton" IsChecked="{Binding IsLoginsCollapsed, Mode=TwoWay}" Margin="0,0,10,0" DockPanel.Dock="Right"/>
+                                <Border Background="#30000000" CornerRadius="8" Margin="0,0,5,0" Padding="2" DockPanel.Dock="Right">
+                                    <Button Content="Clear" Command="{Binding ClearLoginsCommand}" Classes="ClearButton"/>
+                                </Border>
+                            </DockPanel>
+                            <TextBox Name="LoginsTextBox" 
+                                    Watermark="jsmith&#x0a;Administrator&#x0a;svc_jenkins" 
+                                    AcceptsReturn="True" 
+                                    Text="{Binding Logins, Converter={StaticResource StringToListConverter}}" 
+                                    Margin="0,0,0,10" 
+                                    Height="150" 
+                                    FontFamily="Ubuntu Mono, Consolas, monospace" 
+                                    IsVisible="{Binding #LoginsCollapseButton.IsChecked}"/>
+                        </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
             </Grid>
@@ -483,14 +502,17 @@
                                 Background="{Binding CurrentTheme.TextBoxBackground}" 
                                 Foreground="{Binding CurrentTheme.TextForeground}" 
                                 Margin="0,0,10,0" 
-                                DockPanel.Dock="Right"/>
+                                DockPanel.Dock="Right"
+                                IsEnabled="{Binding Logins, Converter={StaticResource CollectionToEnabledConverter}}"/>
                         </DockPanel>
                         <TextBlock Grid.Row="1" Text="{Binding SentinelOneReminder}" Foreground="Red" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding SentinelOneReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
                         <TextBlock Grid.Row="2" Text="{Binding FilePathsReminder}" Foreground="Orange" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding FilePathsReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
                         <Grid Grid.Row="3" ColumnDefinitions="Auto,*">
                             <TextBlock Grid.Column="0" Text="{Binding SentinelOneQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
                             <Border Grid.Column="1" Background="{Binding CurrentTheme.TextBoxBackground}" BorderThickness="1" BorderBrush="#50FFFFFF" CornerRadius="6">
-                                <TextBlock x:Name="SentinelOneOutput" Classes="Output"/>
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                    <TextBlock x:Name="SentinelOneOutput" Classes="Output"/>
+                                </ScrollViewer>
                             </Border>
                         </Grid>
                     </Grid>
@@ -537,13 +559,16 @@
                                     Background="{Binding CurrentTheme.TextBoxBackground}" 
                                     Foreground="{Binding CurrentTheme.TextForeground}" 
                                     Margin="0,0,10,0" 
-                                    DockPanel.Dock="Right"/>
+                                    DockPanel.Dock="Right"
+                                    IsEnabled="{Binding Logins, Converter={StaticResource CollectionToEnabledConverter}}"/>
                         </DockPanel>
                         <TextBlock Grid.Row="1" Text="{Binding CrowdStrikeReminder}" Foreground="Orange" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding CrowdStrikeReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
                         <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
                             <TextBlock Grid.Column="0" Text="{Binding CrowdStrikeQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
                             <Border Grid.Column="1" Background="{Binding CurrentTheme.TextBoxBackground}" BorderThickness="1" BorderBrush="#50FFFFFF" CornerRadius="6">
-                                <TextBlock x:Name="CrowdStrikeOutput" Classes="Output"/>
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                    <TextBlock x:Name="CrowdStrikeOutput" Classes="Output"/>
+                                </ScrollViewer>
                             </Border>
                         </Grid>
                     </Grid>
@@ -590,13 +615,16 @@
                                     Background="{Binding CurrentTheme.TextBoxBackground}" 
                                     Foreground="{Binding CurrentTheme.TextForeground}" 
                                     Margin="0,0,10,0" 
-                                    DockPanel.Dock="Right"/>
+                                    DockPanel.Dock="Right"
+                                    IsEnabled="{Binding Logins, Converter={StaticResource CollectionToEnabledConverter}}"/>
                         </DockPanel>
                         <TextBlock Grid.Row="1" Text="{Binding DefenderReminder}" Foreground="Orange" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding DefenderReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
                         <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
                             <TextBlock Grid.Column="0" Text="{Binding DefenderQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
                             <Border Grid.Column="1" Background="{Binding CurrentTheme.TextBoxBackground}" BorderThickness="1" BorderBrush="#50FFFFFF" CornerRadius="6">
-                                <TextBlock x:Name="DefenderOutput" Classes="Output"/>
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                    <TextBlock x:Name="DefenderOutput" Classes="Output"/>
+                                </ScrollViewer>
                             </Border>
                         </Grid>
                     </Grid>
@@ -643,13 +671,16 @@
                                 Background="{Binding CurrentTheme.TextBoxBackground}" 
                                 Foreground="{Binding CurrentTheme.TextForeground}" 
                                 Margin="0,0,10,0" 
-                                DockPanel.Dock="Right"/>
+                                DockPanel.Dock="Right"
+                                IsEnabled="{Binding Logins, Converter={StaticResource CollectionToEnabledConverter}}"/>
                         </DockPanel>
                         <TextBlock Grid.Row="1" Text="{Binding CBResponseReminder}" Foreground="Red" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding CBResponseReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
                         <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
                             <TextBlock Grid.Column="0" Text="{Binding CBResponseQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
                             <Border Grid.Column="1" Background="{Binding CurrentTheme.TextBoxBackground}" BorderThickness="1" BorderBrush="#50FFFFFF" CornerRadius="6">
-                                <TextBlock x:Name="CBResponseOutput" Classes="Output"/>
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                    <TextBlock x:Name="CBResponseOutput" Classes="Output"/>
+                                </ScrollViewer>
                             </Border>
                         </Grid>
                     </Grid>
@@ -696,13 +727,16 @@
                                     Background="{Binding CurrentTheme.TextBoxBackground}" 
                                     Foreground="{Binding CurrentTheme.TextForeground}" 
                                     Margin="0,0,10,0" 
-                                    DockPanel.Dock="Right"/>
+                                    DockPanel.Dock="Right"
+                                    IsEnabled="{Binding Logins, Converter={StaticResource CollectionToEnabledConverter}}"/>
                         </DockPanel>
                         <TextBlock Grid.Row="1" Text="{Binding CBCloudReminder}" Foreground="Red" FontSize="12" Margin="0,0,0,10" IsVisible="{Binding CBCloudReminder, Converter={StaticResource StringToVisibilityConverter}}"/>
                         <Grid Grid.Row="2" ColumnDefinitions="Auto,*">
                             <TextBlock Grid.Column="0" Text="{Binding CBCloudQuery, Converter={StaticResource LineNumberConverter}}" Foreground="Gray" FontFamily="Ubuntu Mono, Consolas, JetBrains Mono" FontSize="12" Margin="0,0,10,0" TextAlignment="Right"/>
                             <Border Grid.Column="1" Background="{Binding CurrentTheme.TextBoxBackground}" BorderThickness="1" BorderBrush="#50FFFFFF" CornerRadius="6">
-                                <TextBlock x:Name="CBCloudOutput" Classes="Output"/>
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                    <TextBlock x:Name="CBCloudOutput" Classes="Output"/>
+                                </ScrollViewer>
                             </Border>
                         </Grid>
                     </Grid>
