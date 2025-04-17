@@ -179,7 +179,7 @@ namespace Pathfinder
         {
             return theme.Name switch
             {
-                "Night Shift" => new SolidColorBrush(Color.Parse("#2A2A2A")), // Same as Onyx, contrasts with #222222
+                "Night Shift" => new SolidColorBrush(Color.Parse("#8A8A8A")), // Same as Onyx, contrasts with #222222
                 "Matrix" => new SolidColorBrush(Color.Parse("#143C3C")), // Dark teal, contrasts with #0A0A0A
                 "Strawberry Milkshake" => new SolidColorBrush(Color.Parse("#FFAAAA")), // Light pink, contrasts with #FFCCCC
                 "Windows 95" => new SolidColorBrush(Color.Parse("#D3D3D3")), // Light gray, contrasts with #FFFFFF
