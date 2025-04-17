@@ -694,8 +694,8 @@ namespace Pathfinder.ViewModels
 
             if (Logins.Any())
             {
-                var loginConditions = string.Join(" OR ", Logins.Select(l => $"event.login.userName == \"{l}\""));
-                parts.Add($"(((event.type = 'Login') AND (event.login.type != \"UNLOCK\" AND event.login.type != \"INTERACTIVE\" AND event.login.type != \"CACHED_INTERACTIVE\") AND src.endpoint.ip.address != \"127.0.0.1\") AND ({loginConditions}))");
+                var loginConditions = string.Join(" OR ", Logins.Select(l => $"UserName = \"{l}\""));
+                parts.Add($"((#event_simpleName = \"UserLogon\" AND (LogonType=10 OR LogonType=3)) AND ({loginConditions}))");
             }
 
             var userHostParts = new System.Collections.Generic.List<string>();
